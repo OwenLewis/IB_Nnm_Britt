@@ -27,8 +27,8 @@ Nib=length(F);
 
 
 %find normal vectors (assuming X is a circle
-unitnormal=const2*1/rad*X;
-
+% unitnormal=const2*1/rad*X;
+unitnormal=const2*1/rad*(X-repmat([xc,yc],Nib,1));
  
 %%%%%%%%%%%%%%%%%%%%%
 [nSGLSF]=IBNeumm_helm_FD_NEW(a,b,xg,yg,dx,X,ds,F,unitnormal,const1);
