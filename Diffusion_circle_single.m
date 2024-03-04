@@ -3,9 +3,18 @@
 %
 %
 function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
-                                                    printflag,recordflag)
+                                                    printflag,recordflag,rhsMaskFlag)
 
     addpath('./src/');
+
+    if recordflag
+        if ~printflag
+            error("Can't record without plotting")
+        else
+            stationarydiff = VideoWriter('diffusion_stationary.avi');
+            open(stationarydiff);
+        end
+    end
     
     % computational domain parameters
     %
@@ -41,7 +50,6 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     %
     [X0, ds] = circle(xc,yc,rad,ds);
     Nib=length(X0(:,1));
-    sp_scale = ds/dx^2;
 
     % time stepping 
     %
@@ -62,13 +70,6 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     rstart = 10;
     tol    = 1e-6;
     maxiter = 1000;
-    
-    % flag to mask the rhs
-    %
-    rhsMaskFlag = 0;
-    
-    
-
     
     
     % domain mask -- for a circle
@@ -116,10 +117,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     % this is a constant related to time stepping -- FE/BE
-    %
-    a1=1/dt;
-    
-    
+    %    
     % check my SC apply 
     %
     a = 1/dt;
@@ -154,7 +152,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     
         % update for v
         %
-        rhs = uold/dt;
+        rhs = u/dt;
         
         % form rhs for SC solve
         %
@@ -194,9 +192,17 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
             title(sprintf('time = %f',(n-1)*dt))
             pause(0.01)
             hold off
+            if recordflag
+                writeVideo(stationarydiff,getframe(gcf));
+            end %End save video conditional
         end
             
     end  %end time loop
+    if recordflag
+        close(stationarydiff)
+        !HandBrakeCLI -i diffusion_stationary.avi -o diffusion_stationary.mp4
+        !rm diffusion_stationary.avi
+    end
 
     rmpath('./src/');
 
