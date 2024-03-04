@@ -16,7 +16,7 @@
 %
 % output, S -- scaled spreading operator of size Nx*Ny x Nib
 %
-function S = spreadmatrix_vc_vec(X,dx,Nx,Ny,xmin,ymin);
+function S = spreadmatrix_vc_vec(X,grid);
      
   % record the number of unknowns
   %
@@ -24,12 +24,12 @@ function S = spreadmatrix_vc_vec(X,dx,Nx,Ny,xmin,ymin);
 
   % record the number of grid points
   %
-  Nsq = Nx*Ny;
+  Nsq = grid.Nx*grid.Ny;
  
   % convert X to grid coordinates (xg,yg)
   %
-  xg = (X(:,1)-xmin)/dx  + 1;
-  yg = (X(:,2)-ymin)/dx  + 1;
+  xg = (X(:,1)-grid.xmin)/grid.dx  + 1;
+  yg = (X(:,2)-grid.ymin)/grid.dy  + 1;
   
   % indices of grid point down and to the left
   %
@@ -46,7 +46,7 @@ function S = spreadmatrix_vc_vec(X,dx,Nx,Ny,xmin,ymin);
   J1 = J0+1;
   J2 = J0+2;
   
-  % compute the wights
+  % compute the weights
   %
   Wxm = delta(Im - xg);
   Wx0 = delta(I0 - xg);
@@ -61,15 +61,15 @@ function S = spreadmatrix_vc_vec(X,dx,Nx,Ny,xmin,ymin);
   
   % done computing weights, make I and J's periodic
   %
-  Im = mod(Im-1,Nx) + 1;
-  I0 = mod(I0-1,Nx) + 1;
-  I1 = mod(I1-1,Nx) + 1;
-  I2 = mod(I2-1,Nx) + 1;
+  Im = mod(Im-1,grid.Nx) + 1;
+  I0 = mod(I0-1,grid.Nx) + 1;
+  I1 = mod(I1-1,grid.Nx) + 1;
+  I2 = mod(I2-1,grid.Nx) + 1;
  
-  Jm = mod(Jm-1,Ny) + 1;
-  J0 = mod(J0-1,Ny) + 1;
-  J1 = mod(J1-1,Ny) + 1;
-  J2 = mod(J2-1,Ny) + 1;
+  Jm = mod(Jm-1,grid.Ny) + 1;
+  J0 = mod(J0-1,grid.Ny) + 1;
+  J1 = mod(J1-1,grid.Ny) + 1;
+  J2 = mod(J2-1,grid.Ny) + 1;
    
 
   % make four copies of each I,J corresponding to the 16 point stencil of
@@ -92,7 +92,7 @@ function S = spreadmatrix_vc_vec(X,dx,Nx,Ny,xmin,ymin);
 
   % row numbers
   %
-  Kr = sub2ind([Nx,Ny],Iv(:),Jv(:));
+  Kr = sub2ind([grid.Nx,grid.Ny],Iv(:),Jv(:));
   
   % make the (scaled) spreading matrix
   %
