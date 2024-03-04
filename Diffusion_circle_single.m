@@ -198,5 +198,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
             
     end  %end time loop
 
+    rmpath('./src/');
+
 end
 
