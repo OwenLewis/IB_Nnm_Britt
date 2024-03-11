@@ -14,7 +14,7 @@ Ly     = 2;          % height of the domain
 aspect = 1;          % aspect ratio
 Lx     = aspect*Ly;  % length of th domain
 
-Ny     = 128;        % number of mesh points in y-direction
+Ny     = 512;        % number of mesh points in y-direction
 Nx     = aspect*Ny;  % number of mesh points in x-direction
 dy     = Ly/Ny;      % fluid mesh spacing
 dx     = Lx/Nx;     
@@ -57,13 +57,13 @@ Nt   = round(Tmax/dt);
 
 % solver parameters
 %
-rstart = 10;
-tol    = 1e-6;
-maxiter = 1000;
+solveparams.rstart = 10;
+solveparams.tol    = 1e-6;
+solveparams.maxiter = 1000;
 
 % flag to mask the rhs
 %
-rhsMaskFlag = 0;
+rhsMaskFlag = 1;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,7 +154,7 @@ b = Dv;
 %
 
 
-
+gridproblem = 'HelmInv_FD_period'
 
 
 for n=1:Nt  %time loop
@@ -173,34 +173,15 @@ for n=1:Nt  %time loop
     %
     rhs = vold/dt + Rv(vold,wold).*rhsMask;
 %    rhs = vold/dt + Rv(vold,wold);
-    
-    % form rhs for SC solve
-    %
-    rhsSC = -apply_nSGA(rhs,X0,a,b,IB,grid);
-    
-    % Solve for the forces
-    %
-    SCfun = @(F)(apply_IBNeumann_SC(F,X0,a,b,IB,grid));
-    Fv    = gmres(SCfun,rhsSC,rstart,tol,maxiter);
-    
-    % spread operator
-    %
-    S = spreadmatrix_vc_vec(X0,grid);
 
-    % spread the force
-    %
-    Fds = IB.dsvec .* Fv;
-    SF = S*Fds/grid.dx^2;
-    SF = reshape(SF,grid.Nx,grid.Ny);
-
-    % update the voltage
-    %
-    v = HelmInv_FD_period(rhs + SF,a,b,grid);
+    [v,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,gridproblem,solveparams);
+    
     
     
     % visualize
     %
     pcolor(xg,yg,v);
+    shading flat
     colorbar;
     hold on;
     plot(X0(:,1),X0(:,2),'r','linewidth',3);

@@ -80,9 +80,9 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     
     % solver parameters
     %
-    rstart = 10;
-    tol    = 1e-6;
-    maxiter = 1000;
+    solveparams.rstart = 10;
+    solveparams.tol    = 1e-6;
+    solveparams.maxiter = 1000;
     
     
     % domain mask -- for a circle
@@ -161,7 +161,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     asolutions(:,:,1) = ua;
     hsolutions(:,:,1) = uh;
     
-    
+    gridproblem = 'HelmInv_FD_period'
     
     for n=2:Nt  %time loop
 
@@ -204,38 +204,12 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
         %
         rhsa = ua/dt - aadvec + Ra(a_old,h_old).*rhsMask;
         rhsh = uh/dt - hadvec + Rh(a_old,h_old).*rhsMask;
-        
-        % form rhs for SC solve
-        %
-        rhsSCa = -apply_nSGA(rhsa,X0,a,b1,IB,grid);
-        rhsSCh = -apply_nSGA(rhsh,X0,a,b2,IB,grid);
-        
-        % Solve for the forces
-        %
-        SCfuna = @(F)(apply_IBNeumann_SC(F,X0,a,b1,IB,grid));
-        Fva    = gmres(SCfuna,rhsSCa,rstart,tol,maxiter);
-        SCfunh = @(F)(apply_IBNeumann_SC(F,X0,a,b2,IB,grid));
-        Fvh    = gmres(SCfunh,rhsSCh,rstart,tol,maxiter);
-        
-        % spread operator
-        %
-        S = spreadmatrix_vc_vec(X0,grid);
-    
-        % spread the force
-        %
-        Fdsa = IB.dsvec .* Fva;
-        SFa = S*Fdsa/grid.dx^2;
-        SFa = reshape(SFa,grid.Nx,grid.Ny);
-        Fdsh = IB.dsvec .* Fvh;
-        SFh = S*Fdsh/grid.dx^2;
-        SFh = reshape(SFh,grid.Nx,grid.Ny);
 
-    
-        % update the concentration
-        %
-        ua = HelmInv_FD_period(rhsa + SFa,a,b1,grid);
+        [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,gridproblem,solveparams);
+        [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,gridproblem,solveparams);
+        
+        
         asolutions(:,:,n) = ua;
-        uh = HelmInv_FD_period(rhsh + SFh,a,b2,grid);
         hsolutions(:,:,n) = uh;
         
         % visualize

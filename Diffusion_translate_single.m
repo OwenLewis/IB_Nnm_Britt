@@ -78,9 +78,9 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     
     % solver parameters
     %
-    rstart = 10;
-    tol    = 1e-6;
-    maxiter = 1000;
+    solveparams.rstart = 10;
+    solveparams.tol    = 1e-6;
+    solveparams.maxiter = 1000;
     
     
     % domain mask -- for a circle
@@ -149,6 +149,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     u=u_0;
     usolutions(:,:,1) = u;
     
+
+    gridproblem = 'HelmInv_FD_period'
     
     
     for n=2:Nt  %time loop
@@ -177,28 +179,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         %
         rhs = u/dt - advec;
         
-        % form rhs for SC solve
-        %
-        rhsSC = -apply_nSGA(rhs,X0,a,b,IB,grid);
-        
-        % Solve for the forces
-        %
-        SCfun = @(F)(apply_IBNeumann_SC(F,X0,a,b,IB,grid));
-        Fv    = gmres(SCfun,rhsSC,rstart,tol,maxiter);
-        
-        % spread operator
-        %
-        S = spreadmatrix_vc_vec(X0,grid);
-    
-        % spread the force
-        %
-        Fds = IB.dsvec .* Fv;
-        SF = S*Fds/grid.dx^2;
-        SF = reshape(SF,grid.Nx,grid.Ny);
-    
-        % update the concentration
-        %
-        u = HelmInv_FD_period(rhs + SF,a,b,grid);
+
+        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,gridproblem,solveparams);
         usolutions(:,:,n) = u;
         
         % visualize
