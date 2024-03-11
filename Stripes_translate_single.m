@@ -233,9 +233,9 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     
         % update the concentration
         %
-        ua = apply_Hinv_FD(rhsa + SFa,a,b1,grid);
+        ua = HelmInv_FD_period(rhsa + SFa,a,b1,grid);
         asolutions(:,:,n) = ua;
-        uh = apply_Hinv_FD(rhsh + SFh,a,b2,grid);
+        uh = HelmInv_FD_period(rhsh + SFh,a,b2,grid);
         hsolutions(:,:,n) = uh;
         
         % visualize

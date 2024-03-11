@@ -195,7 +195,7 @@ for n=1:Nt  %time loop
 
     % update the voltage
     %
-    v = apply_Hinv_FD(rhs + SF,a,b,grid);
+    v = HelmInv_FD_period(rhs + SF,a,b,grid);
     
     
     % visualize

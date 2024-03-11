@@ -7,7 +7,7 @@ function nSGA=apply_nSGA(g,X,a,b,IB,grid);
 
 % apply the inverse of the Helmholtz operator to g
 %
-A = apply_Hinv_FD(g,a,b,grid);
+A = HelmInv_FD_period(g,a,b,grid);
 
 % compute the gradient
 %

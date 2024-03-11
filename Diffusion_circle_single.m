@@ -175,7 +175,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     
         % update the concentration
         %
-        u = apply_Hinv_FD(rhs + SF,a,b,grid);
+        u = HelmInv_FD_period(rhs + SF,a,b,grid);
         usolutions(:,:,n) = u;
         
         % visualize

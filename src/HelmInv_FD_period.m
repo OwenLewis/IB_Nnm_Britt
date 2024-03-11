@@ -6,7 +6,7 @@
 %  in a periodic box of size (Lx,Ly),
 %  using finite differences solved with FFT
 %
-function u=apply_Hinv_FD(f,a,b,grid)
+function u=HelmInv_FD_period(f,a,b,grid)
 
 % get the wavenumbers
 %

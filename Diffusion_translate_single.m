@@ -198,7 +198,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     
         % update the concentration
         %
-        u = apply_Hinv_FD(rhs + SF,a,b,grid);
+        u = HelmInv_FD_period(rhs + SF,a,b,grid);
         usolutions(:,:,n) = u;
         
         % visualize
