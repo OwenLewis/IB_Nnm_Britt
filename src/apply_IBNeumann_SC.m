@@ -1,4 +1,4 @@
-function nSGASF=apply_IBNeumann_SC(F,X,a,b,IB,grid);
+function nSGASF=apply_IBNeumann_SC(F,X,a,b,IB,grid,gridproblem);
 
 %performs the immersed bounary for Neumann, given F on boundary 
 
@@ -15,7 +15,7 @@ SF = reshape(SF,grid.Nx,grid.Ny);
 % apply n.(interp)*(Gradient)*(inv Helmholtz) to SF
 %   abbreviated nSGA*(SF) 
 %
-nSGASF=apply_nSGA(SF,X,a,b,IB,grid);
+nSGASF=apply_nSGA(SF,X,a,b,IB,grid,gridproblem);
 
 
 % add the constant

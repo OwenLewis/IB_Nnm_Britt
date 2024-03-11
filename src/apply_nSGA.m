@@ -1,4 +1,4 @@
-function nSGA=apply_nSGA(g,X,a,b,IB,grid);
+function nSGA=apply_nSGA(g,X,a,b,IB,grid,gridfunction);
 
 % apply the operator n.S'*Grad*A
 %  where A is the inverse of the Helmholtz operator H = a - b*L, and L is the discrete 
@@ -7,7 +7,8 @@ function nSGA=apply_nSGA(g,X,a,b,IB,grid);
 
 % apply the inverse of the Helmholtz operator to g
 %
-A = HelmInv_FD_period(g,a,b,grid);
+gridproblem = str2func(gridfunction);
+A = gridproblem(g,a,b,grid);
 
 % compute the gradient
 %
