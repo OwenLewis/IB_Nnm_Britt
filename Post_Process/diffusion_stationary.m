@@ -1,5 +1,5 @@
 load ~/Documents/Julia/RadialDiffusion/DiffusionTests/matfile.mat
-load 256_diff_fixed.mat
+load 512_diff_fixed.mat
 
 
 xmin        = -1.5;            
@@ -65,20 +65,16 @@ sgtitle(titlestring,'fontsize',18)
 
 [foo,bar,polardisc] = cart2pol(Xfine,Yfine,discrepancy);
 
-Linf_soln = max(max(abs(soln)))
-L1_soln = sum(sum(Rgrid.*abs(soln)))*dr*dtheta
-L2_soln = sum(sum(Rgrid.*(soln.^2)))*dr*dtheta;
-L2_soln = sqrt(L2_soln)
+Linf_soln = [Linf_soln,max(max(abs(soln)))];
+L1_soln = [L1_soln,sum(sum(Rgrid.*abs(soln)))*dr*dtheta];
+foo = sum(sum(Rgrid.*(soln.^2)))*dr*dtheta;
+L2_soln = [L2_soln,sqrt(foo)];
 
 
-Linf_error = max(max(abs(discrepancy)))
-L1_error = sum(sum(Rgrid.*abs(discrepancy)))*dr*dtheta
-L2_error = sum(sum(Rgrid.*(discrepancy.^2)))*dr*dtheta;
-L2_error = sqrt(L2_error)
+Linf_error = [Linf_error,max(max(abs(discrepancy)))]
+L1_error = [L1_error,sum(sum(Rgrid.*abs(discrepancy)))*dr*dtheta]
+foo = sum(sum(Rgrid.*(discrepancy.^2)))*dr*dtheta;
+L2_error = [L2_error,sqrt(foo)]
 
-    % discrep(:,:,i) = polardisc;
-    % 
-    % absdisc(i) = sum(sum(Rgrid.*polardisc))*dr*dtheta;
-    % reldisc(i) = sum(sum(Rgrid.*polardisc./soln(:,:,i)))*dr*dtheta;
 
 
