@@ -39,11 +39,11 @@ mapback = u(indx,indy,end);
 
 
 [Xfine,Yfine,Cart] = pol2cart(thetagrid,Rgrid,soln);
-matlabfine = interpn(xg,yg,mapback,Xfine,Yfine,'spline');
+matlabfine = interpn(reorderedX,reorderedY,mapback,Xfine,Yfine,'spline');
 discrepancy = abs(matlabfine - Cart);
 
 
-titlestring = sprintf('Time = %f',30);
+titlestring = sprintf('Time = %f',time);
 figure(1)
 set(gcf,'Position',[152 78 1154 719])
 subplot(2,2,1)
@@ -77,20 +77,13 @@ sgtitle(titlestring,'fontsize',18)
 
 [foo,bar,polardisc] = cart2pol(Xfine,Yfine,discrepancy);
 
-Linf_soln = max(max(abs(soln)))
-L1_soln = sum(sum(Rgrid.*abs(soln)))*dr*dtheta
-L2_soln = sum(sum(Rgrid.*(soln.^2)))*dr*dtheta;
-L2_soln = sqrt(L2_soln)
+Linf_soln = [Linf_soln,max(max(abs(soln)))];
+L1_soln = [L1_soln,sum(sum(Rgrid.*abs(soln)))*dr*dtheta];
+foo = sum(sum(Rgrid.*(soln.^2)))*dr*dtheta;
+L2_soln = [L2_soln,sqrt(foo)];
 
 
-Linf_error = max(max(abs(discrepancy)))
-L1_error = sum(sum(Rgrid.*abs(discrepancy)))*dr*dtheta
-L2_error = sum(sum(Rgrid.*(discrepancy.^2)))*dr*dtheta;
-L2_error = sqrt(L2_error)
-
-    % discrep(:,:,i) = polardisc;
-    % 
-    % absdisc(i) = sum(sum(Rgrid.*polardisc))*dr*dtheta;
-    % reldisc(i) = sum(sum(Rgrid.*polardisc./soln(:,:,i)))*dr*dtheta;
-
-
+Linf_error = [Linf_error,max(max(abs(discrepancy)))]
+L1_error = [L1_error,sum(sum(Rgrid.*abs(discrepancy)))*dr*dtheta]
+foo = sum(sum(Rgrid.*(discrepancy.^2)))*dr*dtheta;
+L2_error = [L2_error,sqrt(foo)]
