@@ -3,16 +3,17 @@
 %
 % compute the matrix for the spreading operator
 %  assumes a discretization of x = xmin + dx*(i-1); i=1..Nx
-%                              y = ymin + dx*(j-1); j=1..Ny
+%                              y = ymin + dy*(j-1); j=1..Ny
 %  it also assumes a periodic domain so that xmin == xmin + dx*Nx
 %                                            ymin == ymin + dx*Ny
 %
 % input,  X  --   matrix with ib point locations (size Nib x 2 )
-%         dx --   grid spacing
-%         Nx --   number of grid points in the x-direction
-%         Ny --   number of grid points in the y-direction
-%         xmin -- left edge of the domain
-%         ymin -- bottom edge of the domain
+%         grid -- a struct with the following fields:
+%         grid.dx & grid.dy --   grid spacing
+%         grid.Nx --   number of grid points in the x-direction
+%         grid.Ny --   number of grid points in the y-direction
+%         grid.xmin -- left edge of the domain
+%         grid.ymin -- bottom edge of the domain
 %
 % output, S -- scaled spreading operator of size Nx*Ny x Nib
 %
