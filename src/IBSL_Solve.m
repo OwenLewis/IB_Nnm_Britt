@@ -1,14 +1,14 @@
-function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,gridfunction,solveparams)
+function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
     % form rhs for SC solve
     %
-    rhsSC = -apply_nSGA(rhs,X,a,b,IB,grid,gridfunction);
+    rhsSC = -apply_nSGA(rhs,X,a,b,IB,grid);
     
     % Solve for the forces
     %
-    SCfun = @(F)(apply_IBNeumann_SC(F,X,a,b,IB,grid,gridfunction));
+    SCfun = @(F)(apply_IBNeumann_SC(F,X,a,b,IB,grid));
     Fv    = gmres(SCfun,rhsSC,solveparams.rstart,solveparams.tol,solveparams.maxiter);
     
     % spread operator

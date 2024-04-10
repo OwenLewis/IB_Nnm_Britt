@@ -1,4 +1,4 @@
-function nSGA=apply_nSGA(g,X,a,b,IB,grid,gridfunction);
+function nSGA=apply_nSGA(g,X,a,b,IB,grid)
 
 % apply the operator n.S'*Grad*A
 %  where A is the inverse of the Helmholtz operator H = a - b*L, and L is the discrete 
@@ -7,8 +7,7 @@ function nSGA=apply_nSGA(g,X,a,b,IB,grid,gridfunction);
 
 % apply the inverse of the Helmholtz operator to g
 %
-gridproblem = str2func(gridfunction);
-A = gridproblem(g,a,b,grid);
+A = helmsolve(g,a,b,grid);
 
 % compute the gradient
 %
@@ -16,7 +15,7 @@ GA = gradientFD(A,grid);
 
 % form spread operator
 %
-S = spreadmatrix_vc_vec(X,grid);
+S = spreadmatrix_cc_vec(X,grid);
 
 % interpolate the gradient to the boundary
 %
