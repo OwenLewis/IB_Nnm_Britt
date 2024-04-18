@@ -11,12 +11,20 @@ if size(V) ~= [grid.Nx grid.Ny+1]
     error('Vertical vel. does not match grid size')
 end
 
+xpad = zeros(grid.Nx+2,grid.Ny);
+ypad = zeros(grid.Nx,grid.Ny+2);
 
-rightflux = (c.*U(2:end,:)).*(U(2:end,:) > 0);
-leftflux = (c.*U(1:end-1,:)).*(U(1:end-1,:) < 0);
+xpad(1,:) = c(end,:);
+xpad(2:end-1,:) = c;
+xpad(end,:) = c(1,:);
+ypad(:,1) = c(:,end);
+ypad(:,2:end-1) = c;
+ypad(:,end) = c(:,1);
 
-topflux = (c.*V(:,2:end)).*(V(:,2:end) > 0);
-botflux = (c.*V(:,1:end-1)).*(V(:,1:end-1) < 0);
 
-divflux = (rightflux - leftflux)./grid.dx  + (topflux - botflux)./grid.dy;
+horizflux = (xpad(1:end-1,:).*U).*(U > 0) + (xpad(2:end,:).*U).*(U < 0);
+
+vertflux = (ypad(:,1:end-1).*V).*(V > 0) + (ypad(:,2:end).*V).*(V < 0);
+
+divflux = diff(horizflux,1,1)./grid.dx  + diff(vertflux,1,2)./grid.dy;
 end
