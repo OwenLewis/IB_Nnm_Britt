@@ -42,8 +42,8 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     
     % Cartesian grid
     % 
-    xg=dx*(0:Nx-1)+xmin;
-    yg=dx*(0:Ny-1)+ymin;
+    xg=dx*(0.5:Nx-0.5)+xmin;
+    yg=dx*(0.5:Ny-0.5)+ymin;
     [xg,yg]=ndgrid(xg,yg);
     
     % IB points for a circle
@@ -107,6 +107,8 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     grid.dx   = dx;
     grid.dy   = dy;
     grid.chi  = chi;
+    grid.bcx = 'per';
+    grid.bcy = 'per';
     
     % pack up info on the IB 
     %
@@ -139,7 +141,6 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     usolutions(:,:,1) = u;
     
 
-    gridproblem = 'HelmInv_FD_period'
     
     
     for n=2:Nt  %time loop
@@ -157,7 +158,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
         rhs = u/dt;
         
 
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,gridproblem,solveparams);
+        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams);
         usolutions(:,:,n) = u;
         
         % visualize

@@ -13,7 +13,7 @@ function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams)
     
     % spread operator
     %
-    S = spreadmatrix_vc_vec(X,grid);
+    S = spreadmatrix_cc_vec(X,grid);
 
     % spread the force
     %
@@ -23,7 +23,6 @@ function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams)
 
     % update the concentration
     %
-    gridproblem = str2func(gridfunction);
-    u = gridproblem(rhs + SF,a,b,grid);
+    u = helmsolve(rhs+SF,a,b,grid);
 
 end
