@@ -42,8 +42,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     
     % Cartesian grid
     % 
-    xg=dx*(0:Nx-1)+xmin;
-    yg=dx*(0:Ny-1)+ymin;
+    xg=dx*(0.5:Nx-0.5)+xmin;
+    yg=dx*(0.5:Ny-0.5)+ymin;
     [xg,yg]=ndgrid(xg,yg);
     
     % IB points for a circle
@@ -70,9 +70,10 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     u_0=(sqrt(xg.^2 + yg.^2)<0.95).*exp(-((xg+0.25).^2+(yg+0.2).^2)./(0.3^2));
     u_0 = u_0*3;
 
-    %Some padded arrays that will be relevant
-    xpad = zeros(Nx+1,Ny);
-    ypad = zeros(Nx,Ny+1);
+    %Some staggered grid arrays that are necessary
+    %for the advection step
+    horiz = v*ones(Nx+1,Ny);
+    vert =v*ones(Nx,Ny+1);
     
 
     
@@ -118,6 +119,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     grid.dx   = dx;
     grid.dy   = dy;
     grid.chi  = chi;
+    grid.bcx = 'per';
+    grid.bcy = 'per';
     
     % pack up info on the IB 
     %
@@ -149,9 +152,6 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     u=u_0;
     usolutions(:,:,1) = u;
     
-
-    gridproblem = 'HelmInv_FD_period'
-    
     
     for n=2:Nt  %time loop
 
@@ -169,18 +169,14 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         u = uold.*rhsMask;
 
         %Now we need to evaluate the advective terms
-        xpad(1,:) = uold(end,:);
-        xpad(2:end,:) = uold;
-        ypad(:,1) = uold(:,end);
-        ypad(:,2:end) = uold;
-        advec = diff(v*xpad)/dx + diff(v*ypad,1,2)/dy;
+        advec = upwind_staggered(u,horiz,vert,grid);
     
         % update for v
         %
         rhs = u/dt - advec;
         
 
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,gridproblem,solveparams);
+        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams);
         usolutions(:,:,n) = u;
         
         % visualize

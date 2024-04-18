@@ -12,11 +12,11 @@ if size(V) ~= [grid.Nx grid.Ny+1]
 end
 
 
-rightflux = (c.*U(2:end,:)).*(U(2:end,:) < 0);
-leftflux = (c.*U(1:end-2,:)).*(U(1:end-1,:) > 0);
+rightflux = (c.*U(2:end,:)).*(U(2:end,:) > 0);
+leftflux = (c.*U(1:end-1,:)).*(U(1:end-1,:) < 0);
 
-topflux = (c.*V(:,2:end)).*(V(:,2:end) < 0);
-botflux = (c.*V(:,1:end-1)).*(V(:,1:end-1) > 0);
+topflux = (c.*V(:,2:end)).*(V(:,2:end) > 0);
+botflux = (c.*V(:,1:end-1)).*(V(:,1:end-1) < 0);
 
 divflux = (rightflux - leftflux)./grid.dx  + (topflux - botflux)./grid.dy;
 end
