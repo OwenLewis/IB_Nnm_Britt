@@ -79,7 +79,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
 
     % initial data functions
     %
-    perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
+    %perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
+    perturb=@(theta, r) (cos(4*r.*cos(theta)));%.*((1-r).^2).*r.^2);
     ua_0=chi.*(perturb(thetag, rg)+nu/mu);
     uh_0=nu*ones(size(ua_0))/mu^2;
     
@@ -170,8 +171,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
         % uh = h_old.*rhsMask;
     
 
-        rhsa = ua/dt - aadvec + Ra(a_old,h_old).*rhsMask;
-        rhsh = uh/dt - hadvec + Rh(a_old,h_old).*rhsMask;
+        rhsa = ua/dt + Ra(a_old,h_old).*rhsMask;
+        rhsh = uh/dt + Rh(a_old,h_old).*rhsMask;
 
         [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,solveparams);
         [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,solveparams);
