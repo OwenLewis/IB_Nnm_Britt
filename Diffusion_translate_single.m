@@ -12,7 +12,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
             error("Can't record without plotting")
         else
             translatevid = VideoWriter('diffusion_translate.avi');
-            open(stationarydiff);
+            open(translatevid);
         end
     end
     
