@@ -207,7 +207,7 @@ function [asolutions,hsolutions,timeseries] = Spots_translate_single(Ny,v,Da,Dh,
         % visualize
         %
         if printflag
-            figure(4)
+            figure(5)
             pcolor(xg,yg,ua)
             % caxis([0 1.5])
             colorbar

@@ -207,7 +207,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
         % visualize
         %
         if printflag
-            figure(4)
+            figure(6)
             pcolor(xg,yg,ua)
             % caxis([0 1.5])
             colorbar
