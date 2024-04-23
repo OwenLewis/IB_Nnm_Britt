@@ -11,8 +11,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
         if ~printflag
             error("Can't record without plotting")
         else
-            spotsvid = VideoWriter('GM_spots_translate.avi');
-            open(stationarydiff);
+            stripesvid = VideoWriter('GM_stripes_translate.avi');
+            open(stripesvid);
         end
     end
     
@@ -42,8 +42,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     
     % Cartesian grid
     % 
-    xg=dx*(0:Nx-1)+xmin;
-    yg=dx*(0:Ny-1)+ymin;
+    xg=dx*(0.5:Nx-0.5)+xmin;
+    yg=dx*(0.5:Ny-0.5)+ymin;
     [xg,yg]=ndgrid(xg,yg);
     
     % IB points for a circle
@@ -73,8 +73,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     
 
     %Some padded arrays that will be relevant
-    xpad = zeros(Nx+1,Ny);
-    ypad = zeros(Nx,Ny+1);
+    horiz = v*ones(Nx+1,Ny);
+    vert = v*ones(Nx,Ny+1);
     
 
     
@@ -127,6 +127,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     grid.dx   = dx;
     grid.dy   = dy;
     grid.chi  = chi;
+    grid.bcx = 'per';
+    grid.bcy = 'per';
     
     % pack up info on the IB 
     %
@@ -161,7 +163,6 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     asolutions(:,:,1) = ua;
     hsolutions(:,:,1) = uh;
     
-    gridproblem = 'HelmInv_FD_period'
     
     for n=2:Nt  %time loop
 
@@ -188,25 +189,16 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
         % uh = h_old.*rhsMask;
 
         %Now we need to evaluate the advective terms
-        xpad(1,:) = a_old(end,:);
-        xpad(2:end,:) = a_old;
-        ypad(:,1) = a_old(:,end);
-        ypad(:,2:end) = a_old;
-        aadvec = diff(v*xpad)/dx + diff(v*ypad,1,2)/dy;
-
-        xpad(1,:) = h_old(end,:);
-        xpad(2:end,:) = h_old;
-        ypad(:,1) = h_old(:,end);
-        ypad(:,2:end) = h_old;
-        hadvec = diff(v*xpad)/dx + diff(v*ypad,1,2)/dy;
+        aadvec = upwind_staggered(a_old,horiz,vert,grid);
+        hadvec = upwind_staggered(a_old,horiz,vert,grid);
     
         % update for v
         %
         rhsa = ua/dt - aadvec + Ra(a_old,h_old).*rhsMask;
         rhsh = uh/dt - hadvec + Rh(a_old,h_old).*rhsMask;
 
-        [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,gridproblem,solveparams);
-        [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,gridproblem,solveparams);
+        [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,solveparams);
+        [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,solveparams);
         
         
         asolutions(:,:,n) = ua;
@@ -227,16 +219,16 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
             pause(0.01)
             hold off
             if recordflag
-                writeVideo(spotsvid,getframe(gcf));
+                writeVideo(stripesvid,getframe(gcf));
             end %End save video conditional
         end
         % keyboard
             
     end  %end time loop
     if recordflag
-        close(translatevid)
-        !HandBrakeCLI -i GM_spots_translate.avi -o GM_spots_translate.mp4
-        !rm GM_spots_translate.avi
+        close(stripesvid)
+        !HandBrakeCLI -i GM_stripes_translate.avi -o GM_stripes_translate.mp4
+        !rm GM_stripes_translate.avi
     end
 
     rmpath('./src/');
