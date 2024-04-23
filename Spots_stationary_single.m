@@ -2,7 +2,7 @@
 %   reactions are FitzHugh-Nagumo
 %
 %
-function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh,mu,nu,kap,Tmax,dt,...
+function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,mu,nu,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
 
     addpath('./src/');
@@ -11,8 +11,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
         if ~printflag
             error("Can't record without plotting")
         else
-            stripesvid = VideoWriter('GM_stripes_stationary.avi');
-            open(stripesvid);
+            spotsvid = VideoWriter('GM_spots_stationary.avi');
+            open(spotsvid);
         end
     end
     
@@ -59,7 +59,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     hsolutions=zeros(Nx,Ny,Nt);
 
     %Reaction terms
-    Ra=@(uA,uH)(uA./(uH.*(1+kap*uA.^2))-mu).*uA;
+    Ra=@(uA,uH)(uA./uH-mu).*uA;
     Rh=@(uA,uH)(uA.^2-nu*uH);
     
 
@@ -80,8 +80,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     % initial data functions
     %
     perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
-    ua_0=chi.*(perturb(thetag, rg)+nu/mu);
-    uh_0=nu*ones(size(ua_0))/mu^2;
+    ua_0=chi.*perturb(thetag, rg)+nu/mu;
+    uh_0=nu/mu^2*ones(size(ua_0));
     
     % create the mask for the right size if needed
     %
@@ -151,7 +151,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     
     
     for n=2:Nt  %time loop
-        
+     
 
         if( rhsMaskFlag )
             rhsMask = 1.0*( sqrt((xg - xc).^2 + (yg-yc).^2) < rad);
@@ -176,14 +176,13 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
         [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,solveparams);
         [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,solveparams);
         
-        
         asolutions(:,:,n) = ua;
         hsolutions(:,:,n) = uh;
         
         % visualize
         %
         if printflag
-            figure(8)
+            figure(9)
             pcolor(xg,yg,ua)
             % caxis([0 1.5])
             colorbar
@@ -195,16 +194,15 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
             pause(0.01)
             hold off
             if recordflag
-                writeVideo(stripesvid,getframe(gcf));
+                writeVideo(spotsvid,getframe(gcf));
             end %End save video conditional
         end
-        % keyboard
             
     end  %end time loop
     if recordflag
-        close(stripesvid)
-        !HandBrakeCLI -i GM_stripes_stationary.avi -o GM_stripes_stationary.mp4
-        !rm GM_stripes_stationary.avi
+        close(spotsvid)
+        !HandBrakeCLI -i GM_spots_stationary.avi -o GM_spots_stationary.mp4
+        !rm GM_spots_stationary.avi
     end
 
     rmpath('./src/');
