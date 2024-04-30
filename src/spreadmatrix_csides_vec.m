@@ -93,7 +93,7 @@ function S = spreadmatrix_csides_vec(X,grid);
 
   % row numbers
   %
-  Kr = sub2ind([grid.Nx,grid.Ny+1],Iv(:),Jv(:));
+  Kr = sub2ind([grid.Nx+1,grid.Ny],Iv(:),Jv(:));
   
   % make the (scaled) spreading matrix
   %
