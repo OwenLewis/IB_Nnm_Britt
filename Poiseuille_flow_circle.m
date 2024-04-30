@@ -2,8 +2,17 @@
 %   reactions are FitzHugh-Nagumo
 %
 %
-function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
-                                                    printflag,recordflag,rhsMaskFlag)
+% function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
+                                                    % printflag,recordflag,rhsMaskFlag)
+
+    Ny = 56;
+    v = 0.0;
+    D = 0.1;
+    Tmax = 20;
+    dt = 0.05;
+    printflag = 1;
+    recordflag = 0;
+    rhsMaskFlag = 0;
 
     addpath('./src/');
 
@@ -11,8 +20,8 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
         if ~printflag
             error("Can't record without plotting")
         else
-            translatevid = VideoWriter('diffusion_translate.avi');
-            open(stationarydiff);
+            translatevid = VideoWriter('poiseuille_translate.avi');
+            open(translatevid);
         end
     end
     
@@ -31,10 +40,10 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
     
     % IB parameters
     %
-    xc      = 0.0;         % center of the IB object xc, yc
+    xc      = 0;         % center of the IB object xc, yc
     yc      = 0.0;
     rad     = 1;        % resting radius of the circle
-    dsscale = 0.75;        %ratio of IB points to grid spacing
+    dsscale = 0.25;        %ratio of IB points to grid spacing
     ds      = dsscale*dx;  % IB mesh spacing 
 
 
@@ -49,21 +58,23 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
     % 
     xce = dx*(0:Nx)+xmin;
     yce = dx*(0:Ny)+ymin;
-    [xeh,yeh] = ndgrid(xce,ycc);
-    [xev,yev] = ndgrid(xcc,yce);
+    [xehoriz,yehoriz] = ndgrid(xce,ycc);
+    [xevert,yevert] = ndgrid(xcc,yce);
     % IB points for a circle
     %
     [X0, ds] = circle(xc,yc,rad,ds);
     Nib=length(X0(:,1));
 
-    velU = -(yeh-ymin).*(yeh-ymin-Ly);
+    velU = -(yehoriz-ymin).*(yehoriz-ymin-Ly);
     velU = v*velU/max(max(velU));
 
-    velUcells = -(yg-ymin).*(yg-ymin-Ly);
-    velUcells = v*velUcells/max(max(velUcells));
+    velV = 0*yevert;
+
     % time stepping 
     %
     timeseries=(0:dt:Tmax)';
+    totalconc = timeseries;
+    area = timeseries;
     Nt=length(timeseries);
 
 
@@ -76,22 +87,12 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
         error("CFL Constraint not satisfied")
     end
     
-    
-    % initial data functions
-    %
-    u_0=(sqrt(xg.^2 + yg.^2)<0.95).*exp(-((xg+0.25).^2+(yg+0.2).^2)./(0.3^2));
-    u_0 = u_0*3;
-
-    %Some padded arrays that will be relevant
-    xpad = zeros(Nx+1,Ny);
-    ypad = zeros(Nx,Ny+1);
-    
 
     
     % solver parameters
     %
     solveparams.rstart = 10;
-    solveparams.tol    = 1e-6;
+    solveparams.tol    = 1e-8;
     solveparams.maxiter = 1000;
     
     
@@ -116,8 +117,8 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
                  % circle; -1 for pointing into circle
     
 
-    grid.xmin = xmin+dx/2;
-    grid.ymin = ymin+dx/2; 
+    grid.xmin = xmin;
+    grid.ymin = ymin; 
     grid.Lx   = Lx;
     grid.Ly   = Ly;
     grid.Nx   = Nx;
@@ -125,10 +126,19 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
     grid.dx   = dx;
     grid.dy   = dy;
     grid.chi  = chi;
+    grid.bcx = 'per';
+    grid.bcy = 'dir';
     
     % pack up info on the IB 
     %
     IB = IB_populate(X0);
+
+        % initial data functions
+    %
+    u_0=ones(size(xg));
+
+    % u_0=(sqrt(xg.^2 + yg.^2)<0.95).*exp(-((xg+0.25).^2+(yg+0.2).^2)./(0.3^2));
+    % u_0 = u_0*3;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
@@ -154,21 +164,23 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
     u=u_0;
     usolutions(:,:,1) = u;
     
-
-    gridproblem = 'HelmInv_FD_period'
+    in = inpolygon(xg,yg,X0(:,1),X0(:,2));
+    totalconc(1) = sum(sum(u_0(in)))*grid.dx*grid.dy;
+    area(1) = sum(sum(in))*grid.dx*grid.dy;
     
     
     for n=2:Nt  %time loop
 
-        S = spreadmatrix_vc_vec(X0,grid);
+        Stops = spreadmatrix_csides_vec(X0,grid);
 
-        Uvec  = reshape(velUcells,grid.Nx*grid.Ny,1);
-        Ulag = S'*Uvec;
+        Uvec  = reshape(velU,(grid.Nx+1)*grid.Ny,1);
+        Ulag = Stops'*Uvec;
         Vlag = 0*Ulag;
 
         Update = dt*[Ulag,Vlag];
         X0 = X0+Update;
         IB = IB_populate(X0);
+        IB.normals = -IB.normals;
     
         % store last time step
         %
@@ -176,19 +188,17 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
 
         % Mask u?
         %
-        u = uold.*rhsMask;
+        % u = uold.*rhsMask;
 
         %Now we need to evaluate the advective terms
-        xpad(1,:) = uold(end,:);
-        xpad(2:end,:) = uold;
-        advec = diff(velU.*xpad)/dx;
+        advec = upwind_staggered(uold,velU,velV,grid);
 
         % update for v
         %
         rhs = u/dt - advec;
 
 
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,gridproblem,solveparams);
+        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams);
         usolutions(:,:,n) = u;
         
         % visualize
@@ -196,13 +206,13 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
         if printflag
             figure(6)
             pcolor(xg,yg,u)
-            % caxis([0 1.5])
+            caxis([0 1])
             colorbar
             shading flat
             hold on 
             plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3)
-            % quiver(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,Ulag,Vlag)
-            quiver(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,IB.normals(:,1),IB.normals(:,2))
+            quiver(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,Ulag,Vlag,'k')
+            % quiver(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,IB.normals(:,1),IB.normals(:,2))
             title(sprintf('time = %f',(n-1)*dt))
             pause(0.01)
             hold off
@@ -210,15 +220,42 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
                 writeVideo(translatevid,getframe(gcf));
             end %End save video conditional
         end
+
+        in = inpolygon(xg,yg,X0(:,1),X0(:,2));
+        totalconc(n) = sum(sum(u(in)))*grid.dx*grid.dy;
+        area(n) = sum(sum(in))*grid.dx*grid.dy;
             
     end  %end time loop
     if recordflag
         close(translatevid)
-        !HandBrakeCLI -i diffusion_translate.avi -o diffusion_translate.mp4
-        !rm diffusion_translate.avi
+        !HandBrakeCLI -i poiseuille_translate.avi -o poiseuille_translate.mp4
+        !rm poiseuille_translate.avi
     end
 
-    rmpath('./src/');
+    
+    % S = spreadmatrix_cc_vec(X0,grid);
+    % 
+    % Gu = gradientFD(u,grid);
+    % 
+    % gradvec = reshape(Gu,Nx*Ny,2);
+    % 
+    % gradlag = S'*gradvec;
+    % 
+    % nml = gradlag(:,1).*IB.normals(:,1) + gradlag(:,2).*IB.normals(:,2);
+    % 
+    % hold on
+    % quiver(X0(:,1),X0(:,2),gradlag(:,1),gradlag(:,2),'r')
+    % quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2),'k')
+    % hold off
+    % disp('normal derivative on boundary calculated by hand:')
+    % max(abs(nml))
+   
 
-end
+    figure(1)
+    plot(timeseries,totalconc./totalconc(1),'r',timeseries,area./area(1),'--k','LineWidth',3)
+    legend('Total Concentration Inside','Area of Inside','location','best')
+
+
+    rmpath('./src/');
+% end
 
