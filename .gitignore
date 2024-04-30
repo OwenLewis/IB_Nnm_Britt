@@ -3,4 +3,6 @@ DoNotNeed/*
 FromLaptop/*
 *.mat
 *.asv
+*.mp4
+*.avi
 .DS_Store
