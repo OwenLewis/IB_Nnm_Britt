@@ -2,11 +2,11 @@
 %   reactions are FitzHugh-Nagumo
 %
 %
-% function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
+function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
                                                     % printflag,recordflag,rhsMaskFlag)
 
     Ny = 56;
-    v = 0.0;
+    v = 0.01;
     D = 0.1;
     Tmax = 20;
     dt = 0.05;
@@ -171,10 +171,10 @@
     
     for n=2:Nt  %time loop
 
-        Stops = spreadmatrix_csides_vec(X0,grid);
+        Ssides = spreadmatrix_csides_vec(X0,grid);
 
         Uvec  = reshape(velU,(grid.Nx+1)*grid.Ny,1);
-        Ulag = Stops'*Uvec;
+        Ulag = Ssides'*Uvec;
         Vlag = 0*Ulag;
 
         Update = dt*[Ulag,Vlag];
