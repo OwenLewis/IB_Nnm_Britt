@@ -172,7 +172,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
             hold on
             % plot3(X0(:,1),X0(:,2),ones(size(X0(:,1))),'r','LineWidth',2) 
             plot(X0(:,1),X0(:,2),'r','LineWidth',2) 
-            quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2))
+            % quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2),'k')
             title(sprintf('time = %f',(n-1)*dt))
             pause(0.01)
             hold off

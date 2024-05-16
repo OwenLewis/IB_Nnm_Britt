@@ -119,7 +119,7 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     % pack up info on the IB 
     %
     IB.Nib     = length(X0);
-    IB.normals = unitnormal;
+    IB.normals = -unitnormal;
     IB.dsvec   = ds*ones(IB.Nib,1);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,11 +170,13 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
         % uh = h_old.*rhsMask;
     
 
-        rhsa = ua/dt - aadvec + Ra(a_old,h_old).*rhsMask;
-        rhsh = uh/dt - hadvec + Rh(a_old,h_old).*rhsMask;
+        rhsa = ua/dt  + Ra(a_old,h_old).*rhsMask;
+        rhsh = uh/dt  + Rh(a_old,h_old).*rhsMask;
 
-        [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,solveparams);
-        [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,solveparams);
+        Vb = zeros(Nib,1);
+
+        [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,solveparams,Vb);
+        [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,solveparams,Vb);
         
         asolutions(:,:,n) = ua;
         hsolutions(:,:,n) = uh;
@@ -190,6 +192,7 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
             hold on
             % plot3(X0(:,1),X0(:,2),ones(size(X0(:,1))),'r','LineWidth',2) 
             plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3) 
+            % quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2),'k')
             title(sprintf('time = %f',(n-1)*dt))
             pause(0.01)
             hold off
