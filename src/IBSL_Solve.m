@@ -1,6 +1,10 @@
-function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams)
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
+%IBSL Neumann problem for a-b laplacian u
+%   rhs the rhs in actual helmholtz problem
+%   X, IB points
+%More needed inputs at bottom
+%Vb, neumann boundary conditions
+
 
     % form rhs for SC solve
     %
@@ -9,7 +13,7 @@ function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams)
     % Solve for the forces
     %
     SCfun = @(F)(apply_IBNeumann_SC(F,X,a,b,IB,grid));
-    Fv    = gmres(SCfun,rhsSC,solveparams.rstart,solveparams.tol,solveparams.maxiter);
+    Fv    = gmres(SCfun,Vb+rhsSC,solveparams.rstart,solveparams.tol,solveparams.maxiter);
     
     % spread operator
     %
@@ -23,6 +27,6 @@ function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams)
 
     % update the concentration
     %
-    u = helmsolve(rhs+SF,a,b,grid);
+    u = helmsolve(rhs-SF,a,b,grid);
 
 end

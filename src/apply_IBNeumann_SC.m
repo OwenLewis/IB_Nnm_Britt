@@ -21,7 +21,7 @@ nSGASF=apply_nSGA(SF,X,a,b,IB,grid);
 % add the constant
 %  --need to check the sign on this constant
 %
-nSGASF = nSGASF - 0.5/b*F;
+nSGASF = -nSGASF - 0.5/b*F;
 
 
 

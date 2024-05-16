@@ -113,7 +113,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     % pack up info on the IB 
     %
     IB.Nib     = length(X0);
-    IB.normals = unitnormal;
+    IB.normals = -unitnormal;
     IB.dsvec   = ds*ones(IB.Nib,1);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -156,9 +156,9 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
         % update for v
         %
         rhs = u/dt;
-        
+        Vb = zeros(Nib,1);
 
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams);
+        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb);
         usolutions(:,:,n) = u;
         
         % visualize
@@ -172,6 +172,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
             hold on
             % plot3(X0(:,1),X0(:,2),ones(size(X0(:,1))),'r','LineWidth',2) 
             plot(X0(:,1),X0(:,2),'r','LineWidth',2) 
+            quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2))
             title(sprintf('time = %f',(n-1)*dt))
             pause(0.01)
             hold off
