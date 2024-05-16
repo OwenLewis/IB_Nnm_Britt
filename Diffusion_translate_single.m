@@ -125,7 +125,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     % pack up info on the IB 
     %
     IB.Nib     = length(X0);
-    IB.normals = unitnormal;
+    IB.normals = -unitnormal;
     IB.dsvec   = ds*ones(IB.Nib,1);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -175,8 +175,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         %
         rhs = u/dt - advec;
         
-
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams);
+        Vb = zeros(Nib,1);
+        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb);
         usolutions(:,:,n) = u;
         
         % visualize
