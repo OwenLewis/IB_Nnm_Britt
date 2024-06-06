@@ -1,4 +1,4 @@
-function robin=apply_IBRobin_SS(F,X,a,b,IB,grid,lambda)
+function robin=apply_IBRobin_SS(F,X,a,b,IB,grid,a1,a2)
 
 %performs the immersed bounary for Neumann, given F on boundary 
 
@@ -16,13 +16,13 @@ SF = reshape(SF,grid.Nx,grid.Ny);
 %   abbreviated nSGA*(SF) 
 %
 nSGASF=apply_nSGA(SF,X,a,b,IB,grid);
-SASF=apply_SA(SF,X,A,B,IB,grid);
+SASF=apply_SA(SF,X,a,b,IB,grid);
 
 
 % add the constant
 %  --need to check the sign on this constant
 %
-robin = -nSGASF - lambda*SASF - 0.5/b*F;
+robin = -a2*nSGASF - a1*SASF - a2*0.5/b*F;
 
 
 

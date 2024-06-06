@@ -15,4 +15,5 @@ S = spreadmatrix_cc_vec(X,grid);
 
 % interpolate the result to the boundary
 %
+A = reshape(A,grid.Nx*grid.Ny,1);
 SA = S'*A;
