@@ -1,4 +1,4 @@
-function [u,Fds] = IBSL_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
+function [u,Fds] = IBSL_Nnm_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
 %IBSL Neumann problem for a-b laplacian u
 %   rhs the rhs in actual helmholtz problem
 %   X, IB points

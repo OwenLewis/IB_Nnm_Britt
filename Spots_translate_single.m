@@ -200,8 +200,8 @@ function [asolutions,hsolutions,timeseries] = Spots_translate_single(Ny,v,Da,Dh,
 
         Vb = zeros(Nib,1);
 
-        [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,solveparams,Vb);
-        [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,solveparams,Vb);
+        [ua,Fdsa] = IBSL_Nmn_Solve(rhsa,X0,IB,a,b1,grid,solveparams,Vb);
+        [uh,Fdsh] = IBSL_Nmn_Solve(rhsh,X0,IB,a,b2,grid,solveparams,Vb);
         
         asolutions(:,:,n) = ua;
         hsolutions(:,:,n) = uh;
@@ -219,6 +219,10 @@ function [asolutions,hsolutions,timeseries] = Spots_translate_single(Ny,v,Da,Dh,
             plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3) 
             % quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2),'k')
             title(sprintf('time = %f',(n-1)*dt))
+            set(gca,'FontSize',14)
+            % caxis([0 6])
+            xlim([xmin xmin+Lx])
+            ylim([ymin ymin+Ly])
             pause(0.01)
             hold off
             if recordflag

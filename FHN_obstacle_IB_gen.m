@@ -174,7 +174,7 @@ for n=1:Nt  %time loop
     rhs = vold/dt + Rv(vold,wold).*rhsMask;
 %    rhs = vold/dt + Rv(vold,wold);
 
-    [v,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,gridproblem,solveparams);
+    [v,Fds] = IBSL_Nmn_Solve(rhs,X0,IB,a,b,grid,gridproblem,solveparams);
     
     
     

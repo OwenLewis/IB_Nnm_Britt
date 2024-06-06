@@ -18,9 +18,9 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     
     % computational domain parameters
     %
-    xmin   = -1.5;          % bottom cornrer of the domain
-    ymin   = -1.5;
-    Ly     = 3;          % height of the domain
+    xmin   = -2*1.5;          % bottom cornrer of the domain
+    ymin   = -2*1.5;
+    Ly     = 2*3;          % height of the domain
     aspect = 1;          % aspect ratio
     Lx     = aspect*Ly;  % length of th domain
     
@@ -80,8 +80,11 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     % initial data functions
     %
     %perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
-    perturb=@(theta, r) (cos(4*r.*cos(theta)));%.*((1-r).^2).*r.^2);
-    ua_0=chi.*(perturb(thetag, rg)+nu/mu);
+    % perturb=@(theta, r) (cos(4*r.*cos(theta)));%.*((1-r).^2).*r.^2);
+    perturb=@(theta,r) rand(size(theta));
+    % perturb=@(x,y) sin(pi*(x+y)).*sin(2*pi*(x-y));
+
+    ua_0=chi.*perturb(thetag, rg)+nu/mu;
     uh_0=nu*ones(size(ua_0))/mu^2;
     
     % create the mask for the right size if needed
@@ -176,8 +179,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
 
         Vb = zeros(Nib,1);
 
-        [ua,Fdsa] = IBSL_Solve(rhsa,X0,IB,a,b1,grid,solveparams,Vb);
-        [uh,Fdsh] = IBSL_Solve(rhsh,X0,IB,a,b2,grid,solveparams,Vb);
+        [ua,Fdsa] = IBSL_Nmn_Solve(rhsa,X0,IB,a,b1,grid,solveparams,Vb);
+        [uh,Fdsh] = IBSL_Nmn_Solve(rhsh,X0,IB,a,b2,grid,solveparams,Vb);
         
         
         asolutions(:,:,n) = ua;

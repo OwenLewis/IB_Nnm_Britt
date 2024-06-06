@@ -180,7 +180,6 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
         Update = dt*[Ulag,Vlag];
         X0 = X0+Update;
         IB = IB_populate(X0);
-        IB.normals = -IB.normals;
     
         % store last time step
         %
@@ -198,7 +197,7 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
         rhs = u/dt - advec;
 
 
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams);
+        [u,Fds] = IBSL_Nmn_Solve(rhs,X0,IB,a,b,grid,solveparams);
         usolutions(:,:,n) = u;
         
         % visualize

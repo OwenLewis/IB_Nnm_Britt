@@ -158,7 +158,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
         rhs = u/dt;
         Vb = zeros(Nib,1);
 
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb);
+        [u,Fds] = IBSL_Nmn_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb);
         usolutions(:,:,n) = u;
         
         % visualize
@@ -175,6 +175,10 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
             % quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2),'k')
             title(sprintf('time = %f',(n-1)*dt))
             pause(0.01)
+            set(gca,'FontSize',14)
+            caxis([0 3])
+            xlim([xmin xmin+Lx])
+            ylim([ymin ymin+Ly])
             hold off
             if recordflag
                 writeVideo(stationarydiff,getframe(gcf));

@@ -176,7 +176,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         rhs = u/dt - advec;
         
         Vb = zeros(Nib,1);
-        [u,Fds] = IBSL_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb);
+        [u,Fds] = IBSL_Nmn_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb);
         usolutions(:,:,n) = u;
         
         % visualize
@@ -191,6 +191,10 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
             % plot3(X0(:,1),X0(:,2),ones(size(X0(:,1))),'r','LineWidth',2) 
             plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3) 
             title(sprintf('time = %f',(n-1)*dt))
+            set(gca,'FontSize',14)
+            caxis([0 3])
+            xlim([xmin xmin+Lx])
+            ylim([ymin ymin+Ly])
             pause(0.01)
             hold off
             if recordflag
