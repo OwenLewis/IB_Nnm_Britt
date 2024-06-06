@@ -9,11 +9,12 @@ function [u,Fds] = IBSL_Rbn_Solve(rhs,X,IB,a,b,grid,solveparams,lambda,Vb)
     % form rhs for SC solve
     %
     rhsSC = -apply_nSGA(rhs,X,a,b,IB,grid);
+    rhsSS = -apply_SA(rhs,X,a,b,IB,grid);
     
     % Solve for the forces
     %
-    SCfun = @(F)(apply_IBNeumann_SC(F,X,a,b,IB,grid));
-    Fv    = gmres(SCfun,Vb+rhsSC,solveparams.rstart,solveparams.tol,solveparams.maxiter);
+    SCfun = @(F)(apply_IBRobin_SS(F,X,a,b,IB,grid));
+    Fv    = gmres(SCfun,Vb+rhsSC+rhsSS,solveparams.rstart,solveparams.tol,solveparams.maxiter);
     
     % spread operator
     %
