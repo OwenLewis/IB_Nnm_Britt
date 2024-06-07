@@ -5,6 +5,7 @@ function robin=apply_IBRobin_SS(F,X,a,b,IB,grid,a1,a2)
 % spread operator
 %
 S = spreadmatrix_cc_vec(X,grid);
+% S = spreadmatrix_scalar6ptBspline(X,grid);
 
 % spread the force
 %

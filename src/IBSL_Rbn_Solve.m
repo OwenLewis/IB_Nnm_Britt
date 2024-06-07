@@ -21,6 +21,7 @@ function [u,Fds] = IBSL_Rbn_Solve(rhs,X,IB,a,b,grid,solveparams,Vb,a1,a2)
     % spread operator
     %
     S = spreadmatrix_cc_vec(X,grid);
+    % S = spreadmatrix_scalar6ptBspline(X,grid);
 
     % spread the force
     %

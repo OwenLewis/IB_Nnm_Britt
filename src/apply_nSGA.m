@@ -16,6 +16,7 @@ GA = gradientFD(A,grid);
 % form spread operator
 %
 S = spreadmatrix_cc_vec(X,grid);
+% S = spreadmatrix_scalar6ptBspline(X,grid);
 
 % interpolate the gradient to the boundary
 %

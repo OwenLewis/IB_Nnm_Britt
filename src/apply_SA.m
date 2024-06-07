@@ -12,6 +12,7 @@ A = helmsolve(g,a,b,grid);
 % form spread operator
 %
 S = spreadmatrix_cc_vec(X,grid);
+% S = spreadmatrix_scalar6ptBspline(X,grid);
 
 % interpolate the result to the boundary
 %
