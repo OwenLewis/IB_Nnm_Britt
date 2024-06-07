@@ -1,6 +1,7 @@
 %Test case for new Robin BC routines. 
 addpath('./src/');
-% pwer = 9;
+% pwe1!
+% r = 9;
 Nx = 2^pwer;
 Ny = 2^pwer;
 
@@ -27,16 +28,6 @@ ds      = dsscale*dx;  % IB mesh spacing
 
 
 
-
-%These are the parameters for the mathematical problem I'm trying to solve:
-a = 1;
-b = 1;
-%I'm inverting the operator L = a*I - b*Delta
-
-a1 = 1;
-a2 = 1;
-%The boundary conditions are given by 
-%a1*u + a2*du/dn = Vb
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -105,10 +96,7 @@ grid.bcy = 'per';
 
 % pack up info on the IB 
 %
-IB.Nib     = length(X0);
-IB.normals = -unitnormal;
-IB.dsvec   = ds*ones(IB.Nib,1);
-
+IB = IB_populate(X0);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [u,Fds] = IBSL_Rbn_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb,a1,a2);
 
