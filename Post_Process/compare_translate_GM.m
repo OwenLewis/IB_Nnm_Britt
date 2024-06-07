@@ -1,5 +1,5 @@
 load ~/Documents/Julia/RadialDiffusion/PatternTests/spots_matfile_50.mat
-load 512_spots_trans.mat
+load ../Trans_spots_Conv/512_spot_trans.mat
 
 
 xmin        = -1.5;            
@@ -10,12 +10,12 @@ Lx          = aspect*Ly;     % length of th domain
 xc          = 0;             % center of the IB object xc, yc
 yc          = 0;
 rad         = 1;
-Ny=length(aend(1,:));
-Nx=length(aend(:,1));
+Ny=length(a(1,:));
+Nx=length(a(:,1));
 dy=Ly/Ny;
 dx=Lx/Nx;     
-x=dx*(0:Nx-1)+xmin;
-y=dx*(0:Ny-1)+ymin;
+x=dx*(1/2:Nx-1/2)+xmin;
+y=dx*(1/2:Ny-1/2)+ymin;
 [xg,yg]=ndgrid(x,y);
 
 
@@ -24,7 +24,7 @@ chi = double(chi);
 I = find(chi < eps);
 chi(I) = NaN;
 time = t(end);
-vel = 0.01;
+vel = 0.02;
 
 disp = vel*time;
 
@@ -35,7 +35,7 @@ ystart = mod(yg - disp- ymin,Ly) +ymin;
 [reorderedY,indy] = sortrows(ystart');
 reorderedY = reorderedY';
 
-mapback = aend(indx,indy);
+mapback = a(indx,indy);
 
 
 [Xfine,Yfine,Cart] = pol2cart(thetagrid,Rgrid,solA);
@@ -46,13 +46,13 @@ discrepancy = abs(matlabfine - Cart);
 titlestring = sprintf('Time = %f',time);
 figure(1)
 set(gcf,'Position',[152 78 1154 719])
-subplot(2,2,1)
+subplot(1,2,1)
 pcolor(Xfine,Yfine,Cart)
 title('Julia Fine')
 shading flat
 colorbar
 mycaxis = caxis;
-subplot(2,2,2)
+subplot(1,2,2)
 % pcolor(Xfine,Yfine,matlabfine)
 pcolor(xg,yg,chi.*mapback)
 caxis(mycaxis);
@@ -61,17 +61,17 @@ ylim([-1 1]);
 title('Matlab IB')
 shading flat
 colorbar
-subplot(2,2,3)
-pcolor(Xfine,Yfine,discrepancy)
-title('Abs. Discrep')
-shading flat 
-colorbar
-subplot(2,2,4)
-pcolor(Xfine,Yfine,discrepancy./abs(Cart))
-title('Rel. Discrep')
-shading flat 
-colorbar
-sgtitle(titlestring,'fontsize',18)
+% subplot(2,2,3)
+% pcolor(Xfine,Yfine,discrepancy)
+% title('Abs. Discrep')
+% shading flat 
+% colorbar
+% subplot(2,2,4)
+% pcolor(Xfine,Yfine,discrepancy./abs(Cart))
+% title('Rel. Discrep')
+% shading flat 
+% colorbar
+% sgtitle(titlestring,'fontsize',18)
 
 
 

@@ -1,5 +1,5 @@
-load ~/Documents/Julia/RadialDiffusion/DiffusionTests/matfile_10.mat
-load 512_diff_trans.mat
+load ~/Documents/Julia/RadialDiffusion/DiffusionTests/matfile_50.mat
+load ../Trans_Diff_Conv/0_75_dsscale/512_diff_trans.mat
 
 
 xmin        = -1.5;            
@@ -10,12 +10,12 @@ Lx          = aspect*Ly;     % length of th domain
 xc          = 0;             % center of the IB object xc, yc
 yc          = 0;
 rad         = 1;
-Ny=length(u(1,:,1));
-Nx=length(u(:,1,1));
+Ny=length(u(1,:));
+Nx=length(u(:,1));
 dy=Ly/Ny;
 dx=Lx/Nx;     
-x=dx*(0:Nx-1)+xmin;
-y=dx*(0:Ny-1)+ymin;
+x=dx*(1/2:Nx-1/2)+xmin;
+y=dx*(1/2:Ny-1/2)+ymin;
 [xg,yg]=ndgrid(x,y);
 
 
@@ -24,7 +24,7 @@ chi = double(chi);
 I = find(chi < eps);
 chi(I) = NaN;
 time = t(end);
-vel = 0.05;
+vel = 0.02;
 
 disp = vel*time;
 
@@ -35,7 +35,7 @@ ystart = mod(yg - disp- ymin,Ly) +ymin;
 [reorderedY,indy] = sortrows(ystart');
 reorderedY = reorderedY';
 
-mapback = u(indx,indy,end);
+mapback = u(indx,indy);
 
 
 [Xfine,Yfine,Cart] = pol2cart(thetagrid,Rgrid,soln);
