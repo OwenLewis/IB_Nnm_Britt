@@ -74,19 +74,19 @@ function S = spreadmatrix_scalar6ptBspline(X,grid)
   
   % done computing weights, make I and J's periodic
   %
-  Im2=mod(Im2-1,Nx) +1;
-  Im1 = mod(Im1-1,Nx) + 1;
-  I0 = mod(I0-1,Nx) + 1;
-  I1 = mod(I1-1,Nx) + 1;
-  I2 = mod(I2-1,Nx) + 1;
-  I3 = mod(I3-1, Nx) +1;
+  Im2=mod(Im2-1,grid.Nx) +1;
+  Im1 = mod(Im1-1,grid.Nx) + 1;
+  I0 = mod(I0-1,grid.Nx) + 1;
+  I1 = mod(I1-1,grid.Nx) + 1;
+  I2 = mod(I2-1,grid.Nx) + 1;
+  I3 = mod(I3-1, grid.Nx) +1;
  
-  Jm2=mod(Jm2-1,Ny)+1;
-  Jm1 = mod(Jm1-1,Ny) + 1;
-  J0 = mod(J0-1,Ny) + 1;
-  J1 = mod(J1-1,Ny) + 1;
-  J2 = mod(J2-1,Ny) + 1;
-  J3 = mod(J3-1,Ny) + 1;
+  Jm2=mod(Jm2-1,grid.Ny)+1;
+  Jm1 = mod(Jm1-1,grid.Ny) + 1;
+  J0 = mod(J0-1,grid.Ny) + 1;
+  J1 = mod(J1-1,grid.Ny) + 1;
+  J2 = mod(J2-1,grid.Ny) + 1;
+  J3 = mod(J3-1,grid.Ny) + 1;
 
   % make four copies of each I,J corresponding to the 16 point stencil of
   % the delta function
@@ -109,7 +109,7 @@ function S = spreadmatrix_scalar6ptBspline(X,grid)
 
   % row numbers
   %
-  Kr = sub2ind([Nx,Ny],Iv(:),Jv(:));
+  Kr = sub2ind([grid.Nx,grid.Ny],Iv(:),Jv(:));
   
   % make the (scaled) spreading matrix
   %
