@@ -5,4 +5,6 @@ FromLaptop/*
 *.asv
 *.mp4
 *.avi
+*.fig
+*.eps
 .DS_Store
