@@ -23,7 +23,7 @@ SASF=apply_SA(SF,X,a,b,IB,grid);
 % add the constant
 %  --need to check the sign on this constant
 %
-robin = -a2*nSGASF - a1*SASF - a2*0.5/b*F;
+robin = -a2*(nSGASF + F/(2*b)) - a1*SASF;
 
 
 
