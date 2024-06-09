@@ -12,7 +12,7 @@ a = 1;
 b = 1;
 %I'm inverting the operator L = a*I - b*Delta
 
-a1 = 2;
+a1 = 1;
 a2 = 2;
 %The boundary conditions are given by 
 %a1*u + a2*du/dn = Vb

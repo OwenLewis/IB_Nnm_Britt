@@ -53,7 +53,7 @@ chi = 1.0*( rg <= rad);
 % true solution as well as right hand side. 
 %
 utrue=(xg.^2 - yg.^2).*chi;
-rhs = a*(xg.^2 - yg.^2).*chi;
+rhs = a*(xg.^2 - yg.^2);
 
 %Boundary data:
 normderiv = (2*X0(:,1).^2 - 2*X0(:,2).^2)./rad;

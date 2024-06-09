@@ -9,8 +9,8 @@ function [u,Fds] = IBSL_Rbn_Solve(rhs,X,IB,a,b,grid,solveparams,Vb,a1,a2)
 
     % form rhs for SC solve
     %
-    rhsSC = -a1*apply_nSGA(rhs,X,a,b,IB,grid);
-    rhsSS = -a2*apply_SA(rhs,X,a,b,IB,grid);
+    rhsSC = -a2*apply_nSGA(rhs,X,a,b,IB,grid);
+    rhsSS = -a1*apply_SA(rhs,X,a,b,IB,grid);
     
     % Solve for the forces
     %
