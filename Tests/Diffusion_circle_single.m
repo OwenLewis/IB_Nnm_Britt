@@ -5,7 +5,7 @@
 function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -192,7 +192,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
         !rm diffusion_stationary.avi
     end
 
-    rmpath('./src/');
+    rmpath('../src/');
 
 end
 

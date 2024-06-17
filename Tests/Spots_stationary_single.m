@@ -5,7 +5,7 @@
 function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,mu,nu,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -212,7 +212,7 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
         !rm GM_spots_stationary.avi
     end
 
-    rmpath('./src/');
+    rmpath('../src/');
 
 end
 

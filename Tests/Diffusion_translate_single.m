@@ -5,7 +5,7 @@
 function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -209,7 +209,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         !rm diffusion_translate.avi
     end
 
-    rmpath('./src/');
+    rmpath('../src/');
 
 end
 

@@ -19,7 +19,7 @@
     recordflag = 0;
     rhsMaskFlag = 1;
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -310,6 +310,6 @@
     % legend('Total Concentration Inside','Area of Inside','location','best')
 
 
-    rmpath('./src/');
+    rmpath('../src/');
 % end
 

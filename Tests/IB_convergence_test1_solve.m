@@ -13,7 +13,7 @@
 %
 function sol = IB_convergence_test1_solve(Nx,dsscale,deltaflag);
 
-addpath('./src/');
+addpath('../src/');
 
 % domain parameters
 %
@@ -191,4 +191,6 @@ sol.ux = ux;
 sol.uy = uy;
 sol.Ux = Ux;
 sol.Uy = Uy;
+
+rmpath('../src/');
 

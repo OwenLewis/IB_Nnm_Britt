@@ -5,7 +5,7 @@
 
 clear all;
 
-addpath('./src/')
+addpath('../src/')
 
 xmin        = -0.5;            
 ymin        = -0.5;
@@ -214,5 +214,5 @@ title('Double Layer Refinement Study')
 
 
 
-rmpath('./src/')
+rmpath('../src/')
 

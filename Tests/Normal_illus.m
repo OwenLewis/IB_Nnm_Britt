@@ -1,6 +1,6 @@
 clear all
 close all
-addpath('./src/');
+addpath('../src/');
 flag = 2;
 a = 0;
 b =-1;
@@ -137,4 +137,4 @@ for j = 1:length(Ns)
 end
 
 
-rmpath('./src/');
+rmpath('../src/');

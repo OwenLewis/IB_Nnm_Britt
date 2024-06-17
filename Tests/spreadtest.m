@@ -3,6 +3,7 @@ v = 0.01;
 D = 0.1;
 Tmax = 20;
 
+addpath('../src/');
 
 % computational domain parameters
 %
@@ -90,3 +91,5 @@ hold on
 plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3)
 scatter3(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,fromsides,'k')
 % quiver(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,IB.normals(:,1),IB.normals(:,2))
+
+rmpath('../src/');

@@ -14,7 +14,7 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
     recordflag = 0;
     rhsMaskFlag = 0;
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -255,6 +255,6 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
     legend('Total Concentration Inside','Area of Inside','location','best')
 
 
-    rmpath('./src/');
+    rmpath('../src/');
 % end
 

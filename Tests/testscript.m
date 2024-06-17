@@ -1,5 +1,6 @@
 % clear all
 close all
+addpath('../src/');
 
 flag = 1
 
@@ -81,5 +82,5 @@ end
 
 
 
-
+rmpath('../src/');
 

@@ -1,4 +1,4 @@
-addpath('./src/');
+addpath('../src/');
 
 Ns = [65]% 128 256 512];
 
@@ -106,4 +106,4 @@ for j = 1:length(Ns)
 end
 
 
-rmpath('./src/');
+rmpath('../src/');

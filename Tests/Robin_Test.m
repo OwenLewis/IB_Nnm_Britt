@@ -1,5 +1,5 @@
 %Test case for new Robin BC routines. 
-addpath('./src/');
+addpath('../src/');
 pwer = 6;
 a = 1;
 b = 2;
@@ -118,4 +118,4 @@ L2 = sqrt(sum(error(:).^2)*dx*dy)/(sqrt(sum(utrue(:).^2)*dx*dy))
 L1 = sum(abs(error(:)))*dx*dy/(sum(abs(utrue(:)))*dx*dy)
 Linf = max(abs(error(:)))/max(abs(utrue(:)))
 
-rmpath('./src/');
+rmpath('../src/');

@@ -5,7 +5,7 @@
 function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh,mu,nu,kap,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -214,7 +214,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
         !rm GM_stripes_stationary.avi
     end
 
-    rmpath('./src/');
+    rmpath('../src/');
 
 end
 

@@ -4,7 +4,7 @@
 %
 clear all;
 
-addpath('./src/');
+addpath('../src/');
 
 % computational domain parameters
 %

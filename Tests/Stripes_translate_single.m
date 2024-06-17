@@ -5,7 +5,7 @@
 function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,Dh,mu,nu,kap,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -231,7 +231,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
         !rm GM_stripes_translate.avi
     end
 
-    rmpath('./src/');
+    rmpath('../src/');
 
 end
 

@@ -5,7 +5,7 @@
 function [asolutions,hsolutions,timeseries] = Spots_translate_single(Ny,v,Da,Dh,mu,nu,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
 
-    addpath('./src/');
+    addpath('../src/');
 
     if recordflag
         if ~printflag
@@ -237,7 +237,7 @@ function [asolutions,hsolutions,timeseries] = Spots_translate_single(Ny,v,Da,Dh,
         !rm GM_spots_translate.avi
     end
 
-    rmpath('./src/');
+    rmpath('../src/');
 
 end
 
