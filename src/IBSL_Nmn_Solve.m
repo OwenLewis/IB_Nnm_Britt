@@ -1,4 +1,4 @@
-function [u,Fds] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
+function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
 %IBSL Neumann problem for a-b laplacian u
 %   rhs the rhs in actual helmholtz problem
 %   X, IB points
@@ -13,7 +13,7 @@ function [u,Fds] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
     % Solve for the forces
     %
     SCfun = @(F)(apply_IBNeumann_SC(F,X,a,b,IB,grid));
-    Fv    = gmres(SCfun,Vb+rhsSC,solveparams.rstart,solveparams.tol,solveparams.maxiter);
+    [Fv,~,~,iter]    = gmres(SCfun,Vb+rhsSC,solveparams.rstart,solveparams.tol,solveparams.maxiter);
     
     % spread operator
     %

@@ -1,4 +1,4 @@
-function [u,Fds] = IBSL_Rbn_Solve(rhs,X,IB,a,b,grid,solveparams,Vb,a1,a2)
+function [u,Fds,iter] = IBSL_Rbn_Solve(rhs,X,IB,a,b,grid,solveparams,Vb,a1,a2)
 %IBSL Neumann problem for a-b laplacian u
 %   rhs the rhs in actual helmholtz problem
 %   X, IB points
@@ -16,7 +16,7 @@ function [u,Fds] = IBSL_Rbn_Solve(rhs,X,IB,a,b,grid,solveparams,Vb,a1,a2)
     %
     % test = apply_IBRobin_SS(zeros(IB.Nib,1),X,a,b,)
     SCfun = @(F)(apply_IBRobin_SS(F,X,a,b,IB,grid,a1,a2));
-    Fv    = gmres(SCfun,Vb+rhsSC+rhsSS,solveparams.rstart,solveparams.tol,solveparams.maxiter);
+    [Fv,~,~,iter]    = gmres(SCfun,Vb+rhsSC+rhsSS,solveparams.rstart,solveparams.tol,solveparams.maxiter);
     
     % spread operator
     %
