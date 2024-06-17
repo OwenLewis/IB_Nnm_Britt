@@ -1,7 +1,12 @@
 %Test case for new Robin BC routines. 
 addpath('./src/');
-% pwe1!
-% r = 9;
+pwer = 6;
+a = 1;
+b = 2;
+a1 = 1;
+a2 = 1e-3;
+
+
 Nx = 2^pwer;
 Ny = 2^pwer;
 
