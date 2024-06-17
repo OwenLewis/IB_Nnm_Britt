@@ -7,4 +7,5 @@ FromLaptop/*
 *.avi
 *.fig
 *.eps
+*.pdf
 .DS_Store
