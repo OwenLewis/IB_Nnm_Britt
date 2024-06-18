@@ -5,7 +5,7 @@
 % function [usolutions,timeseries] = Extension_flow_circle(Ny,v,D,Tmax,dt,...
                                                      % printflag,recordflag,rhsMaskFlag)
 
-    Ny = 128;
+    Ny = 512;
     v = 0.1;
     Da = 2.5e-3;
     Dh = 1.0e-1;
@@ -14,9 +14,9 @@
     kap = 0.05;
 
     Tmax = 50;
-    dt = 0.02;
+    dt = 0.05;
     printflag = 1;
-    recordflag = 0;
+    recordflag = 1;
     rhsMaskFlag = 1;
 
     addpath('../src/');
@@ -67,7 +67,8 @@
     [xevert,yevert] = ndgrid(xcc,yce);
     % IB points for a circle
     %
-    [X0, ds] = circle(xc,yc,rad,ds);
+    load("ellipse_high.mat");
+    % [X0, ds] = circle(xc,yc,rad,ds);
     Nib=length(X0(:,1));
 
     % time stepping 
@@ -133,7 +134,7 @@
     % domain mask -- for a circle
     %
     rg=sqrt((xg-xc).^2+(yg-yc).^2);
-    chi = 1.0*( rg <= rad);
+    chi = inpolygon(xg,yg,X0(:,1),X0(:,2));
     
     % create the mask for the right size if needed
     %
@@ -174,14 +175,8 @@
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    % this is a constant related to time stepping -- FE/BE
-    %    
-    % check my SC apply 
-    %
-    a = 1/dt;
-    b1 = Da;
-    b2 = Dh;
-    
+
+
     % THIS CHECKS OUT TO MATCH BRITTANY'S CODE
     %
     %Mnew = zeros(IB.Nib);
@@ -192,23 +187,31 @@
     %end
     %return
     
-    % load 128_strip_equil.mat
-    
+    load stripe_ss.mat
+    aeq = a(:,:,end);
+    heq = h(:,:,end);
 
-    % in = inpolygon(xg,yg,X0(:,1),X0(:,2));
-    % aeq(~in) = 0;
-    % heq(~in) = 0;
 
     ua=aeq;
     uh=heq;
     asolutions(:,:,1) = ua;
     hsolutions(:,:,1) = uh;
+
+
+    % this is a constant related to time stepping -- FE/BE
+    %    
+    % check my SC apply 
+    %
+    a = 1/dt;
+    b1 = Da;
+    b2 = Dh;
+    
     
 
     
     for n=2:Nt  %time loop
 
-        foo = 0.7*timeramp((n-1)*dt);
+        foo = -0.7*timeramp((n-1)*dt);
 
         horiz = foo*fourrollU;
         vert = foo*fourrollV;
@@ -230,6 +233,12 @@
         %
         a_old = ua;
         h_old = uh;
+
+        if( rhsMaskFlag )
+            rhsMask = inpolygon(xg,yg,X0(:,1),X0(:,2));
+        else  
+            rhsMask = ones(Nx,Ny);
+        end
     
         % Mask u?
         %
@@ -242,17 +251,27 @@
     
         % update for v
         %
-        rhsMask = inpolygon(xg,yg,X0(:,1),X0(:,2));
-        
 
+        % 
+        % 
         rhsa = ua/dt - aadvec + Ra(a_old,h_old).*rhsMask;
         rhsh = uh/dt - hadvec + Rh(a_old,h_old).*rhsMask;
+        Vb = zeros(Nib,1);
+        % 
+        [ua,Fdsa] = IBSL_Nmn_Solve(rhsa,X0,IB,a,b1,grid,solveparams,Vb);
+        [uh,Fdsh] = IBSL_Nmn_Solve(rhsh,X0,IB,a,b2,grid,solveparams,Vb);
+        % 
+        % 
+        rhsa = ua/dt + Ra(a_old,h_old).*rhsMask;
+        rhsh = uh/dt + Rh(a_old,h_old).*rhsMask;
+
         Vb = zeros(Nib,1);
 
         [ua,Fdsa] = IBSL_Nmn_Solve(rhsa,X0,IB,a,b1,grid,solveparams,Vb);
         [uh,Fdsh] = IBSL_Nmn_Solve(rhsh,X0,IB,a,b2,grid,solveparams,Vb);
-        
-        
+
+
+
         asolutions(:,:,n) = ua;
         hsolutions(:,:,n) = uh;
         
@@ -260,14 +279,17 @@
         %
         if printflag
             figure(6)
-            pcolor(xg,yg,ua)
-            caxis([0 3.5])
+            pcolor(xg,yg,ua.*rhsMask)
+            caxis([0 3.1])
+            set(gca,'FontSize',14)
+            set(gca,'XTick',[-3:3])
+            set(gca,'YTick',[-3:3])
             colorbar
             shading flat
             hold on
             % plot3(X0(:,1),X0(:,2),ones(size(X0(:,1))),'r','LineWidth',2) 
             plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3) 
-            title(sprintf('time = %f',(n-1)*dt))
+            title(sprintf('time = %.2f',(n-1)*dt))
             pause(0.01)
             hold off
             if recordflag

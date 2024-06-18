@@ -48,7 +48,8 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     
     % IB points for a circle
     %
-    [X0, ds] = circle(xc,yc,rad,ds);
+    % [X0, ds] = circle(xc,yc,rad,ds);
+    load("ellipse_med.mat");
     Nib=length(X0(:,1));
 
     % time stepping 
@@ -74,17 +75,18 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     % domain mask -- for a circle
     %
     [thetag,rg]=cart2pol(xg, yg);
-    chi = 1.0*( rg < rad);
+    chi = inpolygon(xg,yg,X0(:,1),X0(:,2));
 
 
     % initial data functions
     %
-    %perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
+    % perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
     % perturb=@(theta, r) (cos(4*r.*cos(theta)));%.*((1-r).^2).*r.^2);
     perturb=@(theta,r) rand(size(theta));
     % perturb=@(x,y) sin(pi*(x+y)).*sin(2*pi*(x-y));
 
-    ua_0=chi.*perturb(thetag, rg)+nu/mu;
+    % ua_0=chi.*perturb(thetag, rg)+nu/mu;
+    ua_0 = nu/mu + chi.*cos(4*pi*xg);
     uh_0=nu*ones(size(ua_0))/mu^2;
     
     % create the mask for the right size if needed
@@ -102,9 +104,6 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     const2=-1;   % which normal direction i want to use; 1 for pointing out of 
                  % circle; -1 for pointing into circle
     
-    % normals 
-    %
-    unitnormal=const2*1/rad*(X0-repmat([xc,yc],Nib,1));
     
     % pack up info about the Eulerian grid in a single variable
     %
@@ -122,9 +121,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
     
     % pack up info on the IB 
     %
-    IB.Nib     = length(X0);
-    IB.normals = -unitnormal;
-    IB.dsvec   = ds*ones(IB.Nib,1);
+    IB = IB_populate(X0);
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
@@ -158,7 +155,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
         
 
         if( rhsMaskFlag )
-            rhsMask = 1.0*( sqrt((xg - xc).^2 + (yg-yc).^2) < rad);
+            rhsMask = inpolygon(xg,yg,X0(:,1),X0(:,2));
         else  
             rhsMask = ones(Nx,Ny);
         end 
@@ -190,15 +187,18 @@ function [asolutions,hsolutions,timeseries] = Stripes_stationary_single(Ny,Da,Dh
         %
         if printflag
             figure(8)
-            pcolor(xg,yg,ua)
-            % caxis([0 1.5])
+            pcolor(xg,yg,ua.*rhsMask)
+            caxis([0 3.1])
+            set(gca,'FontSize',14)
+            set(gca,'XTick',[-3:3])
+            set(gca,'YTick',[-3:3])
             colorbar
             shading flat
             hold on
             % plot3(X0(:,1),X0(:,2),ones(size(X0(:,1))),'r','LineWidth',2) 
             plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3) 
             % quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2),'k')
-            title(sprintf('time = %f',(n-1)*dt))
+            title(sprintf('time = %.2f',(n-1)*dt))
             pause(0.01)
             hold off
             if recordflag
