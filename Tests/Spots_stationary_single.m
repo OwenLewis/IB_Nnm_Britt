@@ -48,6 +48,7 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     
     % IB points for a circle
     %
+    % load("ellipse_low.mat");
     [X0, ds] = circle(xc,yc,rad,ds);
     Nib=length(X0(:,1));
 
@@ -71,14 +72,13 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     solveparams.maxiter = 1000;
     
     
-    % domain mask -- for a circle
-    %
-    [thetag,rg]=cart2pol(xg, yg);
-    chi = 1.0*( rg < rad);
+    % domain mask -- for the IB
+    chi = inpolygon(xg,yg,X0(:,1),X0(:,2));
 
 
     % initial data functions
     %
+    [thetag,rg]=cart2pol(xg, yg);
     perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
     ua_0=chi.*perturb(thetag, rg)+nu/mu;
     uh_0=nu/mu^2*ones(size(ua_0));
@@ -98,9 +98,7 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     const2=-1;   % which normal direction i want to use; 1 for pointing out of 
                  % circle; -1 for pointing into circle
     
-    % normals 
-    %
-    unitnormal=const2*1/rad*(X0-repmat([xc,yc],Nib,1));
+
     
     % pack up info about the Eulerian grid in a single variable
     %
@@ -118,9 +116,8 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     
     % pack up info on the IB 
     %
-    IB.Nib     = length(X0);
-    IB.normals = -unitnormal;
-    IB.dsvec   = ds*ones(IB.Nib,1);
+    IB = IB_populate(X0);
+    
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
@@ -152,12 +149,6 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     
     for n=2:Nt  %time loop
      
-
-        if( rhsMaskFlag )
-            rhsMask = 1.0*( sqrt((xg - xc).^2 + (yg-yc).^2) < rad);
-        else  
-            rhsMask = ones(Nx,Ny);
-        end 
     
         % store last time step
         %
