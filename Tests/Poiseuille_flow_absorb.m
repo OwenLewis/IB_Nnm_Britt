@@ -5,13 +5,13 @@
 % function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
                                                     % printflag,recordflag,rhsMaskFlag)
 
-    Ny = 56;
-    v = 0.1;
-    D = 0.001;
-    Tmax = 20;
-    dt = 0.05;
+    Ny = 256;
+    v = 0.5;
+    D = 0.02;
+    Tmax = 8;
+    dt = 0.01;
     printflag = 1;
-    recordflag = 0;
+    recordflag = 1;
     rhsMaskFlag = 0;
 
     addpath('../src/');
@@ -40,11 +40,11 @@
     
     % IB parameters
     %
-    xc      = 0;         % center of the IB object xc, yc
+    xc      = 0.25;         % center of the IB object xc, yc
     yc      = -0.5;
     rad     = 0.5;        % resting radius of the circle
     dsscale = 0.25;        %ratio of IB points to grid spacing
-    ds      = dsscale*dx;  % IB mesh spacing 
+    ds0      = dsscale*dx;  % IB mesh spacing 
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,8 +62,17 @@
     [xevert,yevert] = ndgrid(xcc,yce);
     % IB points for a circle
     %
-    [X0, ds] = circle(xc,yc,rad,ds);
-    Nib=length(X0(:,1));
+    [X1, ds1] = circle(xc,yc,rad,ds0);
+    Nibtemp=length(X1(:,1));
+    [X2, ds2] = circle(xc-0.5,yc+1,rad,ds0);
+    IB1 = IB_populate(X1);
+    IB2 = IB_populate(X2);
+
+    X0=[X1;X2];
+    IB.normals = [IB1.normals;IB2.normals];
+    IB.Nib = 2*Nibtemp;
+    IB.dsvec = [IB1.dsvec;IB2.dsvec];
+
 
     velU = -(yehoriz-ymin).*(yehoriz-ymin-Ly);
     velU = v*velU/max(max(velU));
@@ -99,22 +108,23 @@
     % domain mask -- for a circle
     %
     rg=sqrt((xg-xc).^2+(yg-yc).^2);
-    chi = 1.0*( rg <= rad);
+    in1 = inpolygon(xg,yg,X1(:,1),X1(:,2));
+    in2 = inpolygon(xg,yg,X2(:,1),X2(:,2));
+    in = in1 | in2 ;
+    out = ~in;
     
     % create the mask for the right size if needed
     %
     
     if( rhsMaskFlag )
-      rhsMask = chi;
+      rhsMask1 = inpolygon(xg,yg,X1(:,1),X1(:,2));
+      rhsMask2 = inpolygon(xg,yg,X2(:,1),X2(:,2));
+      rhsMask = rhsMask1 | rhsMask2;
+      rhsMask = ~rhsMask;
     else  
       rhsMask = ones(Nx,Ny);
     end
       
-    % constants involved in the SC equation
-    %
-    const1=-1/2; % plus or minus 1/2 Q ( if const2=1, minus interior, plus exterior)
-    const2=-1;   % which normal direction i want to use; 1 for pointing out of 
-                 % circle; -1 for pointing into circle
     
 
     grid.xmin = xmin;
@@ -125,7 +135,7 @@
     grid.Ny   = Ny;
     grid.dx   = dx;
     grid.dy   = dy;
-    grid.chi  = chi;
+    grid.chi  = out;
     grid.bcx = 'per';
     grid.bcy = 'nmn';
     
@@ -135,8 +145,8 @@
 
         % initial data functions
     %
-    % u_0=ones(size(xg);
-    u_0 = ~chi;
+    % u_0=ones(size(xg));
+    u_0 = out;
     % u_0(3,:) = 1;
 
     % u_0=(sqrt(xg.^2 + yg.^2)<0.95).*exp(-((xg+0.25).^2+(yg+0.2).^2)./(0.3^2));
@@ -166,7 +176,6 @@
     u=u_0;
     usolutions(:,:,1) = u;
     
-    in = inpolygon(xg,yg,X0(:,1),X0(:,2));
     totalconc(1) = sum(sum(u_0(in)))*grid.dx*grid.dy;
     area(1) = sum(sum(in))*grid.dx*grid.dy;
     
@@ -180,8 +189,16 @@
         Vlag = 0*Ulag;
 
         Update = dt*[Ulag,Vlag];
-        X0 = X0+Update;
-        IB = IB_populate(X0);
+        X1 = X1+Update(1:Nibtemp,:);
+        X2 = X2+Update(Nibtemp+1:end,:);
+        IB1 = IB_populate(X1);
+        IB2 = IB_populate(X2);
+
+        X0=[X1;X2];
+        IB.normals = [IB1.normals;IB2.normals];
+        IB.Nib = 2*Nibtemp;
+        IB.dsvec = [IB1.dsvec;IB2.dsvec];
+        IB.normals = -IB.normals;
     
         % store last time step
         %
@@ -198,27 +215,34 @@
         %
         rhs = u - advec*dt;
 
-        Vb = zeros(Nib,1);
+        Vb = zeros(2*Nibtemp,1);
         a1 = 1;
         a2 = D;
 
 
-        [u,Fds] = IBSL_Rbn_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb,a1,a2);
+        [u,Fds,iters] = IBSL_Rbn_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb,a1,a2);
+        trueiters = (iters(1)-1)*solveparams.rstart+iters(2)
         usolutions(:,:,n) = u;
         
         % visualize
         %
+
+        % plotMask = inpolygon(xg,yg,X0(:,1),X0(:,2));
+        plotMask = ones(size(xg));
+        % plotMask = 1.0*out;
+        % plotMask(in) = NaN;
         if printflag
             figure(6)
-            pcolor(xg,yg,u)
+            pcolor(xg,yg,u.*plotMask)
             caxis([0 1])
             colorbar
+            set(gca,'FontSize',16)
             shading flat
             hold on 
             plot(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,'or','LineWidth',2,'MarkerSize',3)
             % quiver(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,Ulag,Vlag,'k')
             % quiver(mod(X0(:,1)-xmin,Lx)+xmin,mod(X0(:,2)-ymin,Ly)+ymin,IB.normals(:,1),IB.normals(:,2))
-            title(sprintf('time = %f',(n-1)*dt))
+            title(sprintf('time = %.2f',(n-1)*dt))
             pause(0.01)
             hold off
             if recordflag
