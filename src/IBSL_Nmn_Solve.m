@@ -2,7 +2,6 @@ function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
 %IBSL Neumann problem for a-b laplacian u
 %   rhs the rhs in actual helmholtz problem
 %   X, IB points
-%More needed inputs at bottom
 %Vb, neumann boundary conditions
 
 
@@ -22,7 +21,7 @@ function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
     % spread the force
     %
     Fds = IB.dsvec .* Fv;
-    SF = S*Fds/grid.dx^2;
+    SF = S*Fds/(grid.dx*grid.dy);
     SF = reshape(SF,grid.Nx,grid.Ny);
 
     % update the concentration

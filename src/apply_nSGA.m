@@ -22,6 +22,8 @@ S = spreadmatrix_cc_vec(X,grid);
 %
 GA  = reshape(GA,grid.Nx*grid.Ny,2);
 SGA = S'*GA;
+%%%IS THIS CORRECT?!?!?!!?
+%DON'T WE NEED TO SCALE BY DX*DY, OR BY DS, OR SOMETHING?
 
 % dot with the normal
 %

@@ -26,7 +26,7 @@ function [u,Fds,iter] = IBSL_Rbn_Solve(rhs,X,IB,a,b,grid,solveparams,Vb,a1,a2)
     % spread the force
     %
     Fds = IB.dsvec .* Fv;
-    SF = S*Fds/grid.dx^2;
+    SF = S*Fds/(grid.dx*grid.dy);
     SF = reshape(SF,grid.Nx,grid.Ny);
 
     % update the concentration

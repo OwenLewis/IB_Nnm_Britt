@@ -10,7 +10,7 @@ S = spreadmatrix_cc_vec(X,grid);
 % spread the force
 %
 Fds = IB.dsvec .* F;
-SF = S*Fds/grid.dx^2;
+SF = S*Fds/(grid.dx*grid.dy);
 SF = reshape(SF,grid.Nx,grid.Ny);
 
 % apply n.(interp)*(Gradient)*(inv Helmholtz) to SF
