@@ -7,7 +7,7 @@ function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
 
     % form rhs for SC solve
     %
-    rhsSC = -apply_nSGA(rhs,X,a,b,IB,grid);
+    rhsSC = -apply_nSGA(rhs,X,a,b,IB,grid,solveparams);
     
     % Solve for the forces
     %
@@ -16,7 +16,15 @@ function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
     
     % spread operator
     %
-    S = spreadmatrix_cc_vec(X,grid);
+
+    switch solveparams.deltaflag
+        case 0
+            S = spreadmatrix_cc_vec(X,grid);
+        case 1
+            S = spreadmatrix_scalar6ptBspline(X,grid);
+        otherwise
+            S = spreadmatrix_cc_vec(X,grid);
+    end
 
     % spread the force
     %
