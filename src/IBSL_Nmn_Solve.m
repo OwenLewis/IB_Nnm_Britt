@@ -20,7 +20,7 @@ function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
 
     % spread the force
     %
-    Fds = IB.dsvec .* Fv;
+    Fds = IB.dsvec.*Fv;
     SF = S*Fds/(grid.dx*grid.dy);
     SF = reshape(SF,grid.Nx,grid.Ny);
 
