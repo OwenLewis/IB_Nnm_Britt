@@ -1,4 +1,4 @@
-function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
+function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams,Vb)
 %IBSL Neumann problem for a-b laplacian u
 %   rhs the rhs in actual helmholtz problem
 %   X, IB points
@@ -7,7 +7,7 @@ function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
 
     % form rhs for SC solve
     %
-    rhsSC = -apply_nSGA(rhs,X,a,b,IB,grid,solveparams);
+    rhsSC = -apply_nSGA(rhs,X,a,b,IB,grid);
     
     % Solve for the forces
     %
@@ -17,7 +17,7 @@ function [u,Fds,iter] = IBSL_Nmn_Solve(rhs,X,IB,a,b,grid,solveparams, Vb)
     % spread operator
     %
 
-    switch solveparams.deltaflag
+    switch grid.deltaflag
         case 0
             S = spreadmatrix_cc_vec(X,grid);
         case 1

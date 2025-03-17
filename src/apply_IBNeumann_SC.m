@@ -4,7 +4,14 @@ function nSGASF=apply_IBNeumann_SC(F,X,a,b,IB,grid)
 
 % spread operator
 %
-S = spreadmatrix_cc_vec(X,grid);
+switch grid.deltaflag
+    case 0
+        S = spreadmatrix_cc_vec(X,grid);
+    case 1
+        S = spreadmatrix_scalar6ptBspline(X,grid);
+    otherwise
+        S = spreadmatrix_cc_vec(X,grid);
+end
 
 % spread the force
 %

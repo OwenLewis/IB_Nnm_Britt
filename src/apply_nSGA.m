@@ -15,8 +15,14 @@ GA = gradientFD(A,grid);
 
 % form spread operator
 %
-S = spreadmatrix_cc_vec(X,grid);
-% S = spreadmatrix_scalar6ptBspline(X,grid);
+switch grid.deltaflag
+    case 0
+        S = spreadmatrix_cc_vec(X,grid);
+    case 1
+        S = spreadmatrix_scalar6ptBspline(X,grid);
+    otherwise
+        S = spreadmatrix_cc_vec(X,grid);
+end
 
 % interpolate the gradient to the boundary
 %
