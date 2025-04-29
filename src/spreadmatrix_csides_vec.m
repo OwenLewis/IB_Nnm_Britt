@@ -15,9 +15,9 @@
 %         grid.xmin -- left edge of the domain
 %         grid.ymin -- bottom edge of the domain
 %
-% output, S -- scaled spreading operator of size (Nx+1)*Ny+1 x Nib
+% output, S -- scaled spreading operator of size (Nx+1)*Ny x Nib
 %
-function S = spreadmatrix_csides_vec(X,grid);
+function S = spreadmatrix_csides_vec(X,grid)
      
   % record the number of unknowns
   %
@@ -104,7 +104,7 @@ function S = spreadmatrix_csides_vec(X,grid);
 %
 % delta -- form of the 4-point discrete delta function
 %
-function phi = delta(r);
+function phi = delta(r)
 %  phi = 0.25*( 1.0 + cos(0.5*pi*r));
 
     ra = abs(r);

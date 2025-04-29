@@ -17,7 +17,7 @@
 %
 % output, S -- scaled spreading operator of size Nx*(Ny+1) x Nib
 %
-function S = spreadmatrix_ctops_vec(X,grid);
+function S = spreadmatrix_ctops_vec(X,grid)
      
   % record the number of unknowns
   %
