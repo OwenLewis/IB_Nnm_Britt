@@ -72,6 +72,7 @@ for j = 1:length(Ns)
     % grid.chi  = chi;
     grid.bcx = 'per';
     grid.bcy = 'per';
+    grid.deltaflag = 0;
 
 
 

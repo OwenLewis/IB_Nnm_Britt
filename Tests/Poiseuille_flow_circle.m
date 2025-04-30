@@ -128,6 +128,7 @@ function [usolutions,timeseries] = Poiseuille_flow_circle(Ny,v,D,Tmax,dt,...
     grid.chi  = chi;
     grid.bcx = 'per';
     grid.bcy = 'dir';
+    grid.deltaflag = 0;
     
     % pack up info on the IB 
     %

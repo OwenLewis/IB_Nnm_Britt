@@ -129,6 +129,7 @@ function [asolutions,hsolutions,timeseries] = Stripes_translate_single(Ny,v,Da,D
     grid.chi  = chi;
     grid.bcx = 'per';
     grid.bcy = 'per';
+    grid.deltaflag = 0;
     
     % pack up info on the IB 
     %

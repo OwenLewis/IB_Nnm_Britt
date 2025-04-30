@@ -121,6 +121,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     grid.chi  = chi;
     grid.bcx = 'per';
     grid.bcy = 'per';
+    grid.deltaflag = 0;
     
     % pack up info on the IB 
     %

@@ -138,6 +138,7 @@
     grid.chi  = out;
     grid.bcx = 'per';
     grid.bcy = 'nmn';
+    grid.deltaflag = 0;
     
     % pack up info on the IB 
     %

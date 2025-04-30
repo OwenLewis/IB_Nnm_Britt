@@ -27,7 +27,8 @@ switch flag
         f = 2*Y.*(Y-grid.Ly) + 2*X.*(X-grid.Lx);
         
         grid.bcx = 'dir';
-        grid.bcy = 'dir'
+        grid.bcy = 'dir';
+        grid.deltaflag = 0;
         Uapprox = helmsolve(f,0,-1,grid);
         
         figure(1)
@@ -47,6 +48,7 @@ switch flag
         
         grid.bcx = 'nmn';
         grid.bcy = 'nmn'
+        grid.deltaflag = 0;
         Uapprox = helmsolve(f,0,-1,grid);
         
         figure(1)
@@ -66,6 +68,7 @@ switch flag
         
         grid.bcx = 'per';
         grid.bcy = 'per'
+        grid.deltaflag = 0;
         Uapprox = helmsolve(f,0,-1,grid);
         
         figure(1)

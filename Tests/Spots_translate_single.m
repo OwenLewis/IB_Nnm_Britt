@@ -129,6 +129,7 @@ function [asolutions,hsolutions,timeseries] = Spots_translate_single(Ny,v,Da,Dh,
     grid.chi  = chi;
     grid.bcx = 'per';
     grid.bcy = 'per';
+    grid.deltaflag = 0;
     
     % pack up info on the IB 
     %

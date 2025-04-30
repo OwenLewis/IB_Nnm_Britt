@@ -11,7 +11,7 @@
 %
 %   input 
 %
-function sol = IB_convergence_test2_solve(Nx,dsscale,deltaflag);
+function sol = IB_convergence_test2_solve(Nx,dsscale,deltaflag)
 
 addpath('../src/');
 
@@ -78,6 +78,7 @@ grid.dy   = dy;
 grid.chi  = 1-chi;
 grid.bcx = 'dir';
 grid.bcy = 'dir';
+grid.deltaflag = deltaflag;
 
 % pack up info on the IB 
 %
@@ -155,7 +156,6 @@ Vb = ones(Nib,1);
 solveparams.rstart = 10;
 solveparams.tol    = 1e-10;
 solveparams.maxiter = 1000;
-grid.deltaflag = deltaflag;
 
 
 [u,fds] = IBSL_Nmn_Solve(g,X0,IB,a,b,grid,solveparams,Vb);

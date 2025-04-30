@@ -77,6 +77,7 @@ for iii=1:length(Nyvals)   %This loop is going to do the finest mesh first
     grid.chi  = chi;
     grid.bcx = 'per';
     grid.bcy = 'per';
+    grid.deltaflag = 0;
 
      
     % IB points 
