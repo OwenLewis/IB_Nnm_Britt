@@ -17,7 +17,7 @@ FS = 20;  % font size
 
 % grids to use
 %
-Nx_array = 32 * 2.^(0:6);
+Nx_array = 32 * 2.^(0:8);
 dsscale = 0.5;
 %dsscale = 2.0;
 
@@ -26,15 +26,17 @@ for k=1:length(Nx_array)
   Nx = Nx_array(k);
 
   deltaflag = 0;
-  sol0 = IB_convergence_test1_solve(Nx,dsscale,deltaflag);
+  sol0 = Normal_only_solve(Nx,dsscale,deltaflag);
 
   deltaflag = 1;  
-  sol1 = IB_convergence_test1_solve(Nx,dsscale,deltaflag);
+  sol1 = Normal_only_solve(Nx,dsscale,deltaflag);
 
   % evaluate the derivatives on the boundary for the two delta functions
   %
-  Ux0 = sol0.Ux - 0.5*sol0.F.*sol0.Nv(:,1);  
-  Ux1 = sol1.Ux - 0.5*sol1.F.*sol1.Nv(:,1);  
+
+  thet = atan2(sol0.X0(:,2),sol0.X0(:,1));
+  Ux0 = sol0.Ux - 0.5*sol0.F.*cos(thet);  
+  Ux1 = sol1.Ux - 0.5*sol1.F.*cos(thet);  
 
   err0(k) = max( abs(Ux0 - sol0.Ux_ex) );
   err1(k) = max( abs(Ux1 - sol1.Ux_ex) );
@@ -72,8 +74,9 @@ for Nx = [32 128 512]
 
   % evaluate the derivatives on the boundary for the two delta functions
   %
-  Ux0 = sol0.Ux - 0.5*sol0.F.*sol0.Nv(:,1);  
-  Ux1 = sol1.Ux - 0.5*sol1.F.*sol1.Nv(:,1);  
+  thet = atan2(sol0.X0(:,2),sol0.X0(:,1));
+  Ux0 = sol0.Ux - 0.5*sol0.F.*cos(thet);  
+  Ux1 = sol1.Ux - 0.5*sol1.F.*cos(thet);  
 
 
   figure;

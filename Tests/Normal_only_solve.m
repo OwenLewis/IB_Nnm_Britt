@@ -11,7 +11,7 @@
 %
 %   input 
 %
-function sol = IB_convergence_test1_solve(Nx,dsscale,deltaflag);
+function sol = IB_convergence_test1_solve(Nx,dsscale,deltaflag)
 
 addpath('../src/');
 
@@ -45,7 +45,7 @@ yg=dx*(0:Ny-1)+ymin + dy/2;
 %
 [X0, ds] = circle(xc,yc,rad,ds);
 Nib=length(X0(:,1));
-sp_scale = ds/dx^2;
+sp_scale = ds/(dx*dy);
 unitnormal=1.0/rad*(X0-repmat([xc,yc],Nib,1));
 
 
@@ -78,6 +78,7 @@ grid.dy   = dy;
 grid.chi  = chi;
 grid.bcx = 'dir';
 grid.bcy = 'dir';
+grid.deltaflag = deltaflag;
 
 % pack up info on the IB 
 %
@@ -141,7 +142,7 @@ switch deltaflag
   case 0
     S = spreadmatrix_cc_vec(X0,grid);
   case 1
-    S = spreadmatrix_scalar6ptBspline(X0,dx,Nx,Ny,xmin,ymin);
+    S = spreadmatrix_scalar6ptBspline(X0,grid);
   otherwise
     S = spreadmatrix_cc_vec(X0,grid);  
 end
