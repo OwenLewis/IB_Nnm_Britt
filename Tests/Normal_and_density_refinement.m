@@ -26,10 +26,10 @@ for k=1:length(Nx_array)
   Nx = Nx_array(k);
 
   deltaflag = 0;
-  sol0 = IB_convergence_test2_solve(Nx,dsscale,deltaflag);
+  sol0 = Normal_and_density_solve(Nx,dsscale,deltaflag);
 
   deltaflag = 1;  
-  sol1 = IB_convergence_test2_solve(Nx,dsscale,deltaflag);
+  sol1 = Normal_and_density_solve(Nx,dsscale,deltaflag);
 
   % evaluate the derivatives on the boundary for the two delta functions
   %
