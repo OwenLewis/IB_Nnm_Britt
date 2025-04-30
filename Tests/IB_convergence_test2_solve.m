@@ -155,7 +155,7 @@ Vb = ones(Nib,1);
 solveparams.rstart = 10;
 solveparams.tol    = 1e-10;
 solveparams.maxiter = 1000;
-solveparams.deltaflag = deltaflag
+grid.deltaflag = deltaflag;
 
 
 [u,fds] = IBSL_Nmn_Solve(g,X0,IB,a,b,grid,solveparams,Vb);

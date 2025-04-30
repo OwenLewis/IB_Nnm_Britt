@@ -17,7 +17,7 @@ FS = 20;  % font size
 
 % grids to use
 %
-Nx_array = 32 * 2.^(0:7);
+Nx_array = 32 * 2.^(0:8);
 dsscale = 0.5;
 %dsscale = 2.0;
 
@@ -39,15 +39,31 @@ for k=1:length(Nx_array)
   Ux0 = normderiv0 - 0.5*sol0.F;  
   Ux1 = normderiv1 - 0.5*sol1.F;  
 
+
   truenorm0 = sol0.Ux_ex.*sol0.IB.normals(:,1) + sol0.Uy_ex.*sol0.IB.normals(:,2);
   truenorm1 = sol1.Ux_ex.*sol1.IB.normals(:,1) + sol0.Uy_ex.*sol1.IB.normals(:,2);
 
+
+  tau = [-sin(thet),cos(thet)];
+  tangentderiv0 = sol0.Ux.*tau(:,1) + sol0.Uy.*tau(:,2);
+  tangentderiv1 = sol1.Ux.*tau(:,1) + sol1.Uy.*tau(:,2);
   % err0(k) = max( abs(normderiv0 - 0.5) );
   % err1(k) = max( abs(normderiv1 - 0.5) );
   % err0(k) = max( abs(sol0.F + 1) );
   % err1(k) = max( abs(sol1.F + 1) );
+  % err0(k) = max( abs(Ux0 - 1) );
+  % err1(k) = max( abs(Ux1 + 1) );
+  % err0(k) = max(abs(tangentderiv0));
+  % err1(k) = max(abs(tangentderiv1));
+
+  normalerr0(k) = max( abs(normderiv0 - 0.5) );
+  normalerr1(k) = max( abs(normderiv1 - 0.5) );
+  singleerr0(k) = max( abs(sol0.F + 1) );
+  singleerr1(k) = max( abs(sol1.F + 1) );
+  tangenterr0(k) = max(abs(tangentderiv0));
+  tangenterr1(k) = max(abs(tangentderiv1));
   err0(k) = max( abs(Ux0 - 1) );
-  err1(k) = max( abs(Ux1 + 1) );
+  err1(k) = max( abs(Ux1 - 1) ); 
 
 end
 
@@ -61,13 +77,38 @@ for k=2:length(Nx_array)
   fprintf('%6i %12.3e %6.3f %12.3e %6.3f \n',out);
 end
 
-figure;
+figure(9);
+hp=loglog(Nx_array,singleerr0,'o-',Nx_array,singleerr1,'s-',Nx_array,0.8./Nx_array,'--k');
+set(gca,'fontsize',FS);
+set(hp,'markersize',MS,'Linewidth',LW);
+xlabel('N');
+ylabel('max error in $S^* \partial u/ \partial n$','Interpreter','latex');
+legend('4-point delta','6-point B-spline','\propto 1/N');
+
+
+figure(2);
+hp=loglog(Nx_array,normalerr0,'o-',Nx_array,normalerr1,'s-',Nx_array,0.3./Nx_array,'--k');
+set(gca,'fontsize',FS);
+set(hp,'markersize',MS,'Linewidth',LW);
+xlabel('N');
+ylabel('max error in $F$','Interpreter','latex');
+legend('4-point delta','6-point B-spline','\propto 1/N');
+
+figure(3);
 hp=loglog(Nx_array,err0,'o-',Nx_array,err1,'s-');
 set(gca,'fontsize',FS);
 set(hp,'markersize',MS,'Linewidth',LW);
-xlabel('Nx');
-ylabel('max error in U_{x}');
+xlabel('N');
+ylabel('max error in $S^* \partial u/ \partial n - F/2$','Interpreter','latex');
 legend('4-point delta','6-point B-spline');
+
+figure(4);
+hp=loglog(Nx_array,tangenterr0,'o-',Nx_array,tangenterr0,'s-',Nx_array,0.1./Nx_array,'--k');
+set(gca,'fontsize',FS);
+set(hp,'markersize',MS,'Linewidth',LW);
+xlabel('N');
+ylabel('max error in $S^* \partial u/ \partial \tau$','Interpreter','latex');
+legend('4-point delta','6-point B-spline','\propto 1/N');
 
 
 % make a few plots showing the error on the boundary
