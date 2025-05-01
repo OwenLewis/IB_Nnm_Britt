@@ -11,7 +11,7 @@
 %
 %   input 
 %
-function sol = IB_convergence_test2_solve(Nx,dsscale,deltaflag)
+function sol = Normal_and_density_solve(Nx,dsscale,deltaflag)
 
 addpath('../src/');
 
@@ -89,8 +89,8 @@ IB.dsvec   = ds*ones(IB.Nib,1);
 % exact solution on the mesh
 %
 u_ex = 1 - log(rg + eps).*(chi);
-ux_ex = (chi).*xg./(rg+eps).^2;
-uy_ex = (chi).*yg./(rg+eps).^2;
+ux_ex = -(chi).*xg./(rg+eps).^2;
+uy_ex = -(chi).*yg./(rg+eps).^2;
 
 % exact solution on the boundary 
 %  derivatives are on the outside, inside derivatives are zero
