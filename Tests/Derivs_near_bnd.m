@@ -19,7 +19,7 @@ LW = 4;   % line width
 MS = 12;  % marker size
 FS = 20;  % font size
 
-celltol = 8;
+celltol = 4;
 
 % grids to use
 %
@@ -46,8 +46,8 @@ for k=1:length(Nx_array)
   xerr0 = abs(sol0.ux - sol0.ux_ex);
   yerr0 = abs(sol0.uy - sol0.uy_ex);
 
-  xerr1 = abs(sol0.ux - sol0.ux_ex);
-  yerr1 = abs(sol0.uy - sol0.uy_ex);
+  xerr1 = abs(sol1.ux - sol1.ux_ex);
+  yerr1 = abs(sol1.uy - sol1.uy_ex);
   
   magerr0 = sqrt(xerr0.^2 + yerr0.^2);
   magerr1 = sqrt(xerr1.^2 + yerr1.^2);
@@ -63,6 +63,7 @@ for k=1:length(Nx_array)
   maskerr0inf(k) = max( max(mask.*magerr0) );
   maskerr02(k) = sqrt(sum( sum(mask.*magerr0.^2)*sol0.grid.dx*sol0.grid.dy));
   maskerr01(k) = sum( sum(mask.*magerr0) )*sol0.grid.dx*sol0.grid.dy;
+
   maskerr1inf(k) = max( max(mask.*magerr1) );
   maskerr12(k) = sqrt(sum( sum(mask.*magerr1.^2))*sol1.grid.dx*sol1.grid.dy);
   maskerr11(k) = sum( sum(mask.*magerr1) )*sol1.grid.dx*sol1.grid.dy;
