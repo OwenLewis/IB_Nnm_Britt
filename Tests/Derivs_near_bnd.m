@@ -19,11 +19,11 @@ LW = 4;   % line width
 MS = 12;  % marker size
 FS = 20;  % font size
 
-celltol = 2;
+celltol = 8;
 
 % grids to use
 %
-Nx_array = 32 * 2.^(0:3);
+Nx_array = 32 * 2.^(0:8);
 dsscale = 0.5;
 %dsscale = 2.0;
 
@@ -49,33 +49,23 @@ for k=1:length(Nx_array)
   xerr1 = abs(sol0.ux - sol0.ux_ex);
   yerr1 = abs(sol0.uy - sol0.uy_ex);
   
-  magerr1 = xerr0.^2
+  magerr0 = sqrt(xerr0.^2 + yerr0.^2);
+  magerr1 = sqrt(xerr1.^2 + yerr1.^2);
 
   
-  normalerr0inf(k) = max( abs(normderiv0 - 0.5) );
-  normalerr02(k) = sqrt(sum( sol0.IB.dsvec.*(normderiv0 - 0.5).^2 ));
-  normalerr01(k) = sum( sol0.IB.dsvec.*abs(normderiv0 - 0.5) );
-  normalerr1inf(k) = max( abs(normderiv1 - 0.5) );
-  normalerr12(k) = sqrt(sum( sol1.IB.dsvec.*(normderiv1 - 0.5).^2 ));
-  normalerr11(k) = sum( sol1.IB.dsvec.*abs(normderiv1 - 0.5) );
-  singleerr0inf(k) = max( abs(sol0.F + 1) );
-  singleerr02(k) = sqrt(sum( sol0.IB.dsvec.*(sol0.F + 1).^2 ));
-  singleerr01(k) = sum( sol0.IB.dsvec.*abs(sol0.F + 1) );
-  singleerr1inf(k) = max( abs(sol1.F + 1) );
-  singleerr12(k) = sqrt(sum( sol1.IB.dsvec.*(sol1.F + 1).^2 ));
-  singleerr11(k) = sum( sol1.IB.dsvec.*abs(sol1.F + 1) );
-  tangenterr0inf(k) = max(abs(tangentderiv0));
-  tangenterr02(k) = sqrt(sum( sol0.IB.dsvec.*(tangentderiv0).^2 ));
-  tangenterr01(k) = sum( sol0.IB.dsvec.*abs(tangentderiv0) );
-  tangenterr1inf(k) = max(abs(tangentderiv1));
-  tangenterr12(k) = sqrt(sum( sol1.IB.dsvec.*(tangentderiv1).^2 ));
-  tangenterr11(k) = sum( sol1.IB.dsvec.*abs(tangentderiv1) );
-  err0inf(k) = max( abs(Ux0 - 1) );
-  err02(k) = sqrt(sum( sol0.IB.dsvec.*(Ux0 - 1).^2 ));
-  err01(k) = sum( sol0.IB.dsvec.*abs(Ux0 - 1) );
-  err1inf(k) = max( abs(Ux1 - 1) ); 
-  err12(k) = sqrt(sum( sol1.IB.dsvec.*(Ux1 - 1).^2 ));
-  err11(k) = sum( sol1.IB.dsvec.*abs(Ux1 - 1) );
+  err0inf(k) = max( max(magerr0) );
+  err02(k) = sqrt(sum( sum(magerr0.^2)*sol0.grid.dx*sol0.grid.dy));
+  err01(k) = sum( sum(magerr0) )*sol0.grid.dx*sol0.grid.dy;
+  err1inf(k) = max( max(magerr1) );
+  err12(k) = sqrt(sum( sum(magerr1.^2))*sol1.grid.dx*sol1.grid.dy);
+  err11(k) = sum( sum(magerr1) )*sol1.grid.dx*sol1.grid.dy;
+  
+  maskerr0inf(k) = max( max(mask.*magerr0) );
+  maskerr02(k) = sqrt(sum( sum(mask.*magerr0.^2)*sol0.grid.dx*sol0.grid.dy));
+  maskerr01(k) = sum( sum(mask.*magerr0) )*sol0.grid.dx*sol0.grid.dy;
+  maskerr1inf(k) = max( max(mask.*magerr1) );
+  maskerr12(k) = sqrt(sum( sum(mask.*magerr1.^2))*sol1.grid.dx*sol1.grid.dy);
+  maskerr11(k) = sum( sum(mask.*magerr1) )*sol1.grid.dx*sol1.grid.dy;
 
 end
 
@@ -105,23 +95,23 @@ end
 % xlabel('N');
 % ylabel('error in $S^* \partial u/ \partial n$','Interpreter','latex');
 % legend('L^\infty, 4-point delta','L^2, 4-point delta','L^1, 4-point delta','L^\infty, 6-point B-spline','L^2, 6-point B-spline','L^1, 6-point B-spline','\propto 1/N','location','best');
-% 
-% figure(3);
-% hp=loglog(Nx_array,err0inf,'o-',Nx_array,err02,'o-',Nx_array,err01,'o-',Nx_array,err1inf,'s-',Nx_array,err12,'s-',Nx_array,err11,'s-');%,Nx_array,0.8./Nx_array,'--k');
-% set(gca,'fontsize',FS);
-% set(hp,'markersize',MS,'Linewidth',LW);
-% xlabel('N');
-% ylabel('error in $S^* \partial u/ \partial n - F/2$','Interpreter','latex');
-% legend('L^\infty, 4-point delta','L^2, 4-point delta','L^1, 4-point delta','L^\infty, 6-point B-spline','L^2, 6-point B-spline','L^1, 6-point B-spline','location','best');%'\propto 1/N');
-% 
-% figure(4);
-% hp=loglog(Nx_array,tangenterr0inf,'o-',Nx_array,tangenterr02,'o-',Nx_array,tangenterr01,'o-',Nx_array,tangenterr1inf,'s-',Nx_array,tangenterr12,'s-',Nx_array,tangenterr11,'s-',Nx_array,0.8./Nx_array,'--k');
-% set(gca,'fontsize',FS);
-% set(hp,'markersize',MS,'Linewidth',LW);
-% xlabel('N');
-% ylabel('error in $S^* \partial u/ \partial \tau$','Interpreter','latex');
-% legend('L^\infty, 4-point delta','L^2, 4-point delta','L^1, 4-point delta','L^\infty, 6-point B-spline','L^2, 6-point B-spline','L^1, 6-point B-spline','\propto 1/N','location','best');
-% 
+
+figure(3);
+hp=loglog(Nx_array,err0inf,'o-',Nx_array,err02,'o-',Nx_array,err01,'o-',Nx_array,err1inf,'s-',Nx_array,err12,'s-',Nx_array,err11,'s-',Nx_array,0.8./Nx_array,'--k');
+set(gca,'fontsize',FS);
+set(hp,'markersize',MS,'Linewidth',LW);
+xlabel('N');
+ylabel('error in $\nabla u$','Interpreter','latex');
+legend('L^\infty, 4-point delta','L^2, 4-point delta','L^1, 4-point delta','L^\infty, 6-point B-spline','L^2, 6-point B-spline','L^1, 6-point B-spline','\propto 1/N','location','best');
+
+figure(4);
+hp=loglog(Nx_array,maskerr0inf,'o-',Nx_array,maskerr02,'o-',Nx_array,maskerr01,'o-',Nx_array,maskerr1inf,'s-',Nx_array,maskerr12,'s-',Nx_array,maskerr11,'s-',Nx_array,0.8./Nx_array,'--k');
+set(gca,'fontsize',FS);
+set(hp,'markersize',MS,'Linewidth',LW);
+xlabel('N');
+ylabel('Masked error in $\nabla u$','Interpreter','latex');
+legend('L^\infty, 4-point delta','L^2, 4-point delta','L^1, 4-point delta','L^\infty, 6-point B-spline','L^2, 6-point B-spline','L^1, 6-point B-spline','\propto 1/N','location','best');
+
 
 
 
