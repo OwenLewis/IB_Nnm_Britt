@@ -18,9 +18,9 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     
     % computational domain parameters
     %
-    xmin   = -3;          % bottom cornrer of the domain
-    ymin   = -3;
-    Ly     = 6;          % height of the domain
+    xmin   = -1.5;          % bottom cornrer of the domain
+    ymin   = -1.5;
+    Ly     = 3;          % height of the domain
     aspect = 1;          % aspect ratio
     Lx     = aspect*Ly;  % length of th domain
     
@@ -48,8 +48,8 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     
     % IB points for a circle
     %
-    load("ellipse_med.mat");
-    % [X0, ds] = circle(xc,yc,rad,ds);
+    % load("ellipse_med.mat");
+    [X0, ds] = circle(xc,yc,rad,ds);
     Nib=length(X0(:,1));
 
     % time stepping 
@@ -75,13 +75,15 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     % domain mask -- for the IB
     chi = inpolygon(xg,yg,X0(:,1),X0(:,2));
 
+    [thetag,rg] = cart2pol(xg,yg);
+
 
     % initial data functions
     %
     % [thetag,rg]=cart2pol(xg*1.5, yg/1.5);
-    % perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
-    % ua_0=chi.*perturb(thetag, rg)+nu/mu;
-    ua_0=chi.*cos(3*pi*xg)+nu/mu;
+    perturb=@(theta, r) (cos(theta).*((1-r).^2).*r.^2);
+    ua_0=chi.*perturb(thetag, rg)+nu/mu;
+    % ua_0=chi.*cos(3*pi*xg)+nu/mu;
     uh_0=nu/mu^2*ones(size(ua_0));
     
     % create the mask for the right size if needed
