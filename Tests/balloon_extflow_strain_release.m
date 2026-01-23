@@ -7,12 +7,11 @@
 % add a strain dependent release of chemical
 %
 %
-addpath('./src/');
-addpath('./fourierbdy/');
-addpath('~/Matlab/IB_Nnm_Britt/src/');
+addpath('../src/');
+addpath('../src/FluidStructure/');
 addpath('~/Simulations/Matlab_Post_Pro/colormaps/')
 
-recordflag = 1;
+recordflag = 0;
 
 if recordflag
     strainvid = VideoWriter('strain_release.avi');
@@ -38,7 +37,7 @@ L0          = 0.75;           % length of |X_s| where no tension L0<1,
 % base simulation was set up on Ny = 128 grid
 %  integer factor for refinement
 %
-refine_fact = 8;
+refine_fact = 1;
 
 
 % define numerical parameters
