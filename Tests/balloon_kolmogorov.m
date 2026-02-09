@@ -1,10 +1,8 @@
 %
-% perform a simulation an elastic circular membrane in a background extensional flow
+% perform a simulation an elastic circular membrane in a background Kolmogorov flow
 %  uses a coarse mesh of control points, and a finer mesh for spreading
 %   fine mesh values are computed using Fourier interpolation
 %   computation of force and normals is done using Fourier spectral methods
-%
-% add a strain dependent release of chemical
 %
 %
 addpath('../src/');
@@ -13,31 +11,27 @@ addpath('~/Simulations/Matlab_Post_Pro/colormaps/')
 
 recordflag = 1;
 
+mysky = sky;
+foo = max(max(mysky));
+mysky = mysky./foo;
+
 if recordflag
     strainvid = VideoWriter('absorb_balloon.avi');
     open(strainvid);
 end
 % define physical parameters
 %
-xmin        = -0.5;            % bottom corner of the domain xmin,ymin
+xmin        = -1;            % bottom corner of the domain xmin,ymin
 ymin        = -1.0;
 Ly          = 2.0;            % height of the domain
-aspect      = 1/2;              % aspect ratio
+aspect      = 1;              % aspect ratio
 Lx          = aspect*Ly;      % length of th domain
-xc          = -0.25;            % center of the IB object xc, yc
-yc          = -0.75;
-rad         = 0.125;           % resting radius of the circle
-ks          = 1;              % stiffness coefficient
-strain_init = 0.0;            % relative increas in x-dirction if ellipse
-L0          = 0.75;           % length of |X_s| where no tension L0<1,
-                              %   rest is under tension and membrane is
-                              %   pressurized; L0=1, p=0 at rest
 
 
 % base simulation was set up on Ny = 128 grid
 %  integer factor for refinement
 %
-refine_fact = 2;
+refine_fact = 4;
 
 
 % define numerical parameters
@@ -45,12 +39,6 @@ refine_fact = 2;
 Ny = 128*refine_fact;          % number of mesh points in y-direction
 Nx = aspect*Ny;   % number of mesh points in x-direction
 dx = Ly/Ny;       % fluid mesh spacing
-
-% parameter spacing on the coarse mesh and the refinement ratio for the 
-%  the fine mesh
-%
-dsc        = 3*dx;
-fine_ratio = 8;
 
 tend = 10;            % end time of simulation
 dt   = 0.05/refine_fact;            % time step
@@ -64,7 +52,7 @@ Nt   = round(tend/dt);  % number of steps to take
 %
 % st_thresh = 0.4;
 % g=@(t)((t-st_thresh).*(t>st_thresh));
-release_rate = 0.05;
+release_rate = 0.02;
 chem_decay   = 0;
 diff_const   = 0.01;
 
@@ -126,16 +114,34 @@ grid.bcx = 'per';
 grid.bcy = 'per';
 grid.deltaflag = 0;
  
+% parameter spacing on the coarse mesh and the refinement ratio for the 
+%  the fine mesh
+%
+dsc        = 3*dx;
+fine_ratio = 8;
 
 % initialize the control points
 %
-[Xc, dsc] = circle(xc,yc,rad,dsc);
-ds = dsc/fine_ratio;
+rad         = 0.125;           % resting radius of the circles
+ks          = 0.7;              % stiffness coefficient
+strain_init = 0.0;            % relative increase in x-dirction if ellipse
+L0          = 0.75;           % length of |X_s| where no tension L0<1,
+                              %   rest is under tension and membrane is
+                              %   pressurized; L0=1, p=0 at rest
+xc1          = -0.75;            % center of the IB object xc, yc
+yc1          = -0.75;
+xc2          = -0.5;
+yc2          = -0.5;
+
+
+[Xc1, dsc1] = circle(xc1,yc1,rad,dsc);
+[Xc2, dsc2] = circle(xc2,yc2,rad,dsc);
+ds = dsc1/fine_ratio;
 sp_scale = ds/dx^2;
 
 % numbers of coarse and fine points
 %
-Nib_c = size(Xc,1);
+Nib_c = size(Xc1,1);
 Nib_f = Nib_c * fine_ratio;
 
 % record the length of the boundary -- this is needed for differentiation
@@ -150,9 +156,11 @@ th = th(1:Nib_f)';
 
 
 % transform the circle to an ellipse with the same area
-%
-Xc(:,1) = (1+strain_init)*(Xc(:,1)-xc) + xc;
-Xc(:,2) = (Xc(:,2)-yc)/(1+strain_init) + yc;
+% I DON'T THINK THIS IS NEEDED ANY LONGER, SO I'M COMMENTING
+% Xc1(:,1) = (1+strain_init)*(Xc1(:,1)-xc1) + xc1;
+% Xc1(:,2) = (Xc1(:,2)-yc1)/(1+strain_init) + yc1;
+% Xc2(:,1) = (1+strain_init)*(Xc2(:,1)-xc2) + xc2;
+% Xc2(:,2) = (Xc2(:,2)-yc2)/(1+strain_init) + yc2;
  
  
 % initialize the chemical and the flux
@@ -166,21 +174,28 @@ for k=1:Nt
     
     % get the fine grid points
     %
-    [X,DXI] = extend_coarse_to_fine(Xc,Nib_f,Lb);
+    [X1,DXI1] = extend_coarse_to_fine(Xc1,Nib_f,Lb);
+    [X2,DXI2] = extend_coarse_to_fine(Xc2,Nib_f,Lb);
     
     % get the normals on the fine grid
     %
-    length_dxds=sqrt(sum(DXI.^2,2));
-    unitnormals = [DXI(:,2),-DXI(:,1)]./length_dxds(:,[1 1]);      
+    length_dxds1=sqrt(sum(DXI1.^2,2));
+    unitnormals1 = [DXI1(:,2),-DXI1(:,1)]./length_dxds1(:,[1 1]);
+    length_dxds2=sqrt(sum(DXI2.^2,2));
+    unitnormals2 = [DXI2(:,2),-DXI2(:,1)]./length_dxds2(:,[1 1]);   
       
     % compute IB force from current configuraiton
     %
-    [F,st] = stretch_force_fourier(X,ks,Lb,L0);
+    [F1,st1] = stretch_force_fourier(X1,ks,Lb,L0);
+    [F2,st2] = stretch_force_fourier(X2,ks,Lb,L0);
+    F = vertcat(F1,F2);
+    st = vertcat(st1,st2);
 
     % data structure for IB with normals, ds=|dX/d(theta)|d(theta)|
     % 
-    IB.normals = unitnormals;
-    IB.dsvec   = length_dxds*ds;
+    X = vertcat(X1,X2);
+    IB.normals = vertcat(unitnormals1,unitnormals2);
+    IB.dsvec   = vertcat(length_dxds1,length_dxds2)*ds;
 
     % compue flux on the boundary and the normal derivative
     %
@@ -211,9 +226,10 @@ for k=1:Nt
     
     % flag the inside points with a 1
     %
-    chi = inpolygon(xg,yg,X(:,1),X(:,2));
-    kout = find(chi==0);
-    kin = find(chi==1);
+    chi1 = inpolygon(xg,yg,X1(:,1),X1(:,2));
+    chi2 = inpolygon(xg,yg,X2(:,1),X2(:,2));
+    kout = find(chi1==0&chi2==0);
+    kin = find(chi1==1|chi2==1);
     
     
     % equation to solve
@@ -244,7 +260,7 @@ for k=1:Nt
 
     % exploit linearity -- add background flow
     %
-    if( k*dt < 10)
+    if( k*dt < 15)
       u = u + ubg; 
     end
     
@@ -254,8 +270,8 @@ for k=1:Nt
     time = k*dt;
     p = p - p(1,1);
 
-    figure(1);
-    set(gcf,'Position',[440 278 560.2 420]);
+    figure(2);
+    set(gcf,'Position',[240 278 1020 420]);
     clf;
  
     % put nans outside the cell
@@ -267,18 +283,20 @@ for k=1:Nt
     % 
     ax1 = axes;
 
-    pcolor(xg,yg,chem_vis); shading interp;
+    % pcolor(xg,yg,chem_vis); shading interp;
+    contourf(xg,yg,chem_vis,[0.1:0.2:0.9],'--','LineWidth',4); shading interp;
     caxis([0 1]);
    %  colormap(flipud(hot));
-   % colormap(sky);
+   colormap(mysky);
    % colormap(hsv2);
-   colormap(flipud(shuncmap));
+   % colormap(flipud(shuncmap));
     
 
     axis([xmin xmin+Lx ymin 0]);
-    axis square;
-    set(gca,'YTick',[])
+    % axis square;
+    % set(gca,'YTick',[])
     hold on;
+    % contourf(xg,yg,chem_vis,[0:0.2:1],'--','LineWidth',3)
     
           
     % velocity vectors
@@ -288,9 +306,14 @@ for k=1:Nt
     JJ = 1:velskip:grid.Ny;    
     velmag = max(sqrt( sum(u.^2,3) ),[],'all');
     velmag0 = 0.1;
+
+    extvelU = u(:,:,1);
+    extvelU(kin) = NaN;
+    extvelV = u(:,:,2);
+    extvelV(kin) = NaN;
     
-    hq=quiver(xg(II,JJ),yg(II,JJ),u(II,JJ,1),u(II,JJ,2),velmag/velmag0);
-    set(hq,'linewidth',3.5,'color',[0 0 0]);
+    hq=quiver(xg(II,JJ),yg(II,JJ),extvelU(II,JJ),extvelV(II,JJ),velmag/velmag0);
+    set(hq,'linewidth',3.5,'color',[0.81,0.53,0.11]);
     
     title(sprintf('time = %.2f',time),'fontsize',14);
     set(ax1,'fontsize',20);
@@ -306,44 +329,55 @@ for k=1:Nt
         
     % plot the IB on separate axes
     %
-    ax2 = axes; 
-    set(ax2,'fontsize',20);
-    Xper = [X; X(1,:)];
-    stper = [st; st(1)];
+    % ax2 = axes; 
+    % set(ax2,'fontsize',20);
+    Xper1 = [X1; X1(1,:)];
+    Xcopy1 = Xper1;
+    Xcopy1(:,1) = Xcopy1(:,1) - Lx;
+    stper1 = [st1; st1(1)];
+    Xper2 = [X2; X2(1,:)];
+    Xcopy2 = Xper2;
+    Xcopy2(:,1) = Xcopy2(:,1) - Lx;
+    % Xper2(:,1) = mod(Xper2(:,1)-xmin,Lx)+xmin;
+    stper2 = [st2; st2(1)];
+
+    plot(Xper1(:,1),Xper1(:,2),'r',Xcopy1(:,1),Xcopy1(:,2),'r',Xper2(:,1),Xper2(:,2),'r',Xcopy2(:,1),Xcopy2(:,2),'r','linewidth',6)
   
     % this visual of the boundary highlights stretching
     %   st here is a scaled tension 
     % 
-   % hp = patch([Xper(:,1);NaN],[Xper(:,2); NaN],[stper; NaN],'EdgeColor','interp');
-   % hp.LineWidth = 6;
-   % colormap(ax2,'copper');
-   % clim([0.25 0.5]);
   
     % visual will give a view of stretch and compression
     %
-    hp = patch([Xper(:,1);NaN],[Xper(:,2); NaN],[stper-0.25; NaN],'EdgeColor','interp');
-    hp.LineWidth = 6;
-    foo = flipud(spring);
-    colormap(ax2,pink);
-    clim([-0.05 0.05]);
-    hc=colorbar('westoutside','AxisLocation','in');
-    ylabel(hc,'Strain','FontSize',20,'Rotation',270);
-    foo = hc.Label.Position;
-    foo(1) = foo(1) - 5.5;
-    hc.Label.Position = foo;
+    % hp1 = patch([Xper1(:,1);NaN],[Xper1(:,2); NaN],[stper1; NaN],'EdgeColor','interp');
+    % hp1.LineWidth = 6;
+    % hp3 = patch([Xcopy1(:,1);NaN],[Xcopy1(:,2); NaN],[stper1; NaN],'EdgeColor','interp');
+    % hp3.LineWidth = 6;
+    % hp2 = patch([Xper2(:,1);NaN],[Xper2(:,2); NaN],[stper2; NaN],'EdgeColor','interp');
+    % hp2.LineWidth = 6;
+    % hp4 = patch([Xcopy2(:,1);NaN],[Xcopy2(:,2); NaN],[stper2; NaN],'EdgeColor','interp');
+    % hp4.LineWidth = 6;
+    % foo = flipud(spring);
+    % colormap(ax2,flipud(pink));
+    % clim([0.2 0.3]);
+    % hc=colorbar('westoutside','AxisLocation','in');
+    % ylabel(hc,'Strain','FontSize',20,'Rotation',270);
+    % foo = hc.Label.Position;
+    % foo(1) = foo(1) - 5.5;
+    % hc.Label.Position = foo;
 
     % hold on
     % plot(X(I,1),X(I,2),'dk','linewidth',2,'markersize',4)
     % hold off
   
-    ax2.UserData = linkprop([ax1,ax2], ...
-    {'Position','InnerPosition','DataAspectRatio','xlim','ylim'});
-    linkaxes([ax1 ax2]);
-    ax2.Visible= 'off';
-    myposition = get(ax2,'innerposition');
-    offset = 0.2;
-    myposition(1) = myposition(1) + offset/5;
-    set(ax2,'InnerPosition',myposition)
+    % ax2.UserData = linkprop([ax1,ax2], ...
+    % {'Position','InnerPosition','DataAspectRatio','xlim','ylim'});
+    % linkaxes([ax1 ax2]);
+    % ax2.Visible= 'off';
+    % myposition = get(ax2,'innerposition');
+    % offset = 0.2;
+    % myposition(1) = myposition(1) + offset/5;
+    % set(ax2,'InnerPosition',myposition)
     
     pause(0.01);
     if recordflag
@@ -351,12 +385,6 @@ for k=1:Nt
     end %End save video conditional
 
 
-%    figure(2);
-%    plot(th,st,'linewidth',4);
-%    set(gca,'fontsize',16);
-%    xlabel('angle');
-%    ylabel('strain');
-%    ylim([0 0.75]);
   
     
     % interpolate to the IB
@@ -367,11 +395,13 @@ for k=1:Nt
         
     % project interpolated velocity onto the control points
     %
-    U = restrict_fine_to_coarse(U,Nib_c);
+    U1 = restrict_fine_to_coarse(U(1:Nib_f,:),Nib_c);
+    U2 = restrict_fine_to_coarse(U(Nib_f+1:end,:),Nib_c);
     
     % move the points
     %
-    Xc = Xc + dt*U;
+    Xc1 = Xc1 + dt*U1;
+    Xc2 = Xc2 + dt*U2;
     
 end
 
