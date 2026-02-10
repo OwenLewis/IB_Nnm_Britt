@@ -15,6 +15,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
             open(translatevid);
         end
     end
+
+    gridaligned = 1;
     
     % computational domain parameters
     %
@@ -72,9 +74,16 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
     %Some staggered grid arrays that are necessary
     %for the advection step
-    horiz = v*ones(Nx+1,Ny);
-    vert =v*ones(Nx,Ny+1);
-    
+    %If this flag is set to true, we advect along the grid (to make the
+    %advection stepping error as small as possible for convergence
+    %investigation). 
+    if gridaligned
+        horiz = v*ones(Nx+1,Ny);
+        vert =v*zeros(Nx,Ny+1);
+    else
+        horiz = v*ones(Nx+1,Ny);
+        vert =v*ones(Nx,Ny+1);
+    end
 
     
     % solver parameters
@@ -157,8 +166,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     for n=2:Nt  %time loop
 
         %We move the IB first
-        xc = xc + v*dt;
-        yc = yc + v*dt;
+        xc = xc + horiz(1,1)*dt;
+        yc = yc + vert(1,1)*dt;
         [X0, ds] = circle(xc,yc,rad,ds);
     
         % store last time step
