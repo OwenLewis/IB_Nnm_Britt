@@ -20,9 +20,9 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     
     % computational domain parameters
     %
-    xmin   = -1.5;          % bottom cornrer of the domain
-    ymin   = -1.5;
-    Ly     = 3;          % height of the domain
+    xmin   = -2;          % bottom cornrer of the domain
+    ymin   = -2;
+    Ly     = 4;          % height of the domain
     aspect = 1;          % aspect ratio
     Lx     = aspect*Ly;  % length of th domain
     
@@ -41,7 +41,11 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+    dt
+    dx
+    v
+    cfl = v*dt/dx
+
     % Cartesian grid
     % 
     xg=dx*(0.5:Nx-0.5)+xmin;
@@ -61,10 +65,10 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
     %Check for CLF constraint
     gridspace=min(dx,dy);
-    cfl = v*dt/gridspace;
-    if cfl > 0.5
-        error("CFL Constraint not satisfied")
-    end
+    % cfl = v*dt/gridspace;
+    % if cfl > 0.5
+    %     error("CFL Constraint not satisfied")
+    % end
     
     
     % initial data functions

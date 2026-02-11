@@ -18,9 +18,9 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
     
     % computational domain parameters
     %
-    xmin   = -1.5;          % bottom cornrer of the domain
-    ymin   = -1.5;
-    Ly     = 3;          % height of the domain
+    xmin   = -2;          % bottom cornrer of the domain
+    ymin   = -2;
+    Ly     = 4;          % height of the domain
     aspect = 1;          % aspect ratio
     Lx     = aspect*Ly;  % length of th domain
     
@@ -172,7 +172,7 @@ function [usolutions,timeseries] = Diffusion_circle_single(Ny,D,Tmax,dt,...
             shading flat
             hold on
             % plot3(X0(:,1),X0(:,2),ones(size(X0(:,1))),'r','LineWidth',2) 
-            plot(X0(:,1),X0(:,2),'r','LineWidth',2) 
+            plot(X0(:,1),X0(:,2),'or','LineWidth',2,'MarkerSize',3)
             % quiver(X0(:,1),X0(:,2),IB.normals(:,1),IB.normals(:,2),'k')
             title(sprintf('time = %f',(n-1)*dt))
             pause(0.01)
