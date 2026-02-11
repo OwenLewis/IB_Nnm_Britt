@@ -13,19 +13,19 @@
 
 refine = 1
 [u,t] = Diffusion_translate_single(64*refine,0.1,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../064_adv_axis_align.mat','u','t','-v7.3')
+save('../TimeSplitting/064_adv_axis_align.mat','u','t','-v7.3')
 refine = 2
 [u,t] = Diffusion_translate_single(64*refine,0.1,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../128_adv_axis_align.mat','u','t','-v7.3')
+save('../TimeSplitting/128_adv_axis_align.mat','u','t','-v7.3')
 refine = 4
 [u,t] = Diffusion_translate_single(64*refine,0.1,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../256_adv_axis_align.mat','u','t','-v7.3')
+save('../TimeSplitting/256_adv_axis_align.mat','u','t','-v7.3')
 refine = 8
 [u,t] = Diffusion_translate_single(64*refine,0.1,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../512_adv_axis_align.mat','u','t','-v7.3')
+save('../TimeSplitting/512_adv_axis_align.mat','u','t','-v7.3')
 refine = 16
 [u,t] = Diffusion_translate_single(64*refine,0.1,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../1024_adv_axis_align.mat','u','t','-v7.3')
+save('../TimeSplitting/1024_adv_axis_align.mat','u','t','-v7.3')
 
 
 
@@ -34,16 +34,16 @@ save('../1024_adv_axis_align.mat','u','t','-v7.3')
 
 refine = 1
 [u,t] = Diffusion_circle_single(64*refine,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../064_diff_shorttime.mat','u','t','-v7.3')
+save('../TimeSplitting/064_diff_shorttime.mat','u','t','-v7.3')
 refine = 2
 [u,t] = Diffusion_circle_single(64*refine,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../128_diff_shorttime.mat','u','t','-v7.3')
+save('../TimeSplitting/128_diff_shorttime.mat','u','t','-v7.3')
 refine = 4
 [u,t] = Diffusion_circle_single(64*refine,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../256_diff_shorttime.mat','u','t','-v7.3')
+save('../TimeSplitting/256_diff_shorttime.mat','u','t','-v7.3')
 refine = 8
 [u,t] = Diffusion_circle_single(64*refine,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../512_diff_shorttime.mat','u','t','-v7.3')
+save('../TimeSplitting/512_diff_shorttime.mat','u','t','-v7.3')
 refine = 16
 [u,t] = Diffusion_circle_single(64*refine,2.5e-3,5,((4/64)/0.1)/refine,1,0,0);
-save('../1024_diff_shorttime.mat','u','t','-v7.3')
+save('../TimeSplitting/1024_diff_shorttime.mat','u','t','-v7.3')
