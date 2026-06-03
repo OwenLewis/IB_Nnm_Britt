@@ -116,6 +116,7 @@ function [asolutions,hsolutions,timeseries] = Spots_stationary_single(Ny,Da,Dh,m
     grid.chi  = chi;
     grid.bcx = 'per';
     grid.bcy = 'per';
+    grid.deltaflag = 0;
     
     % pack up info on the IB 
     %
