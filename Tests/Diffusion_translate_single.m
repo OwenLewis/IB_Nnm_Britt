@@ -15,14 +15,12 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
             open(translatevid);
         end
     end
-
-    gridaligned = 1;
     
     % computational domain parameters
     %
-    xmin   = -2;          % bottom cornrer of the domain
-    ymin   = -2;
-    Ly     = 4;          % height of the domain
+    xmin   = -1.5;          % bottom cornrer of the domain
+    ymin   = -1.5;
+    Ly     = 3;          % height of the domain
     aspect = 1;          % aspect ratio
     Lx     = aspect*Ly;  % length of th domain
     
@@ -41,11 +39,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    dt
-    dx
-    v
-    cfl = v*dt/dx
-
+    
     % Cartesian grid
     % 
     xg=dx*(0.5:Nx-0.5)+xmin;
@@ -61,14 +55,14 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     %
     timeseries=(0:dt:Tmax)';
     Nt=length(timeseries);
-    usolutions=zeros(Nx,Ny,Nt); %for storing u solutions
+    usolutions=zeros(Nx,Ny,2); %for storing u solutions
 
     %Check for CLF constraint
     gridspace=min(dx,dy);
-    % cfl = v*dt/gridspace;
-    % if cfl > 0.5
-    %     error("CFL Constraint not satisfied")
-    % end
+    cfl = v*dt/gridspace;
+    if cfl > 0.5
+        error("CFL Constraint not satisfied")
+    end
     
     
     % initial data functions
@@ -78,16 +72,9 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
     %Some staggered grid arrays that are necessary
     %for the advection step
-    %If this flag is set to true, we advect along the grid (to make the
-    %advection stepping error as small as possible for convergence
-    %investigation). 
-    if gridaligned
-        horiz = v*ones(Nx+1,Ny);
-        vert =v*zeros(Nx,Ny+1);
-    else
-        horiz = v*ones(Nx+1,Ny);
-        vert =v*ones(Nx,Ny+1);
-    end
+    horiz = v*ones(Nx+1,Ny);
+    vert =v*ones(Nx,Ny+1);
+    
 
     
     % solver parameters
@@ -170,8 +157,8 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
     for n=2:Nt  %time loop
 
         %We move the IB first
-        xc = xc + horiz(1,1)*dt;
-        yc = yc + vert(1,1)*dt;
+        xc = xc + v*dt;
+        yc = yc + v*dt;
         [X0, ds] = circle(xc,yc,rad,ds);
     
         % store last time step
@@ -191,7 +178,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         
         Vb = zeros(Nib,1);
         [u,Fds] = IBSL_Nmn_Solve(rhs,X0,IB,a,b,grid,solveparams,Vb);
-        usolutions(:,:,n) = u;
+        % usolutions(:,:,n) = u;
         
         % visualize
         %
@@ -222,7 +209,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         !HandBrakeCLI -i diffusion_translate.avi -o diffusion_translate.mp4
         !rm diffusion_translate.avi
     end
-
+    usolutions(:,:,2) = u;
     rmpath('../src/');
 
 end
