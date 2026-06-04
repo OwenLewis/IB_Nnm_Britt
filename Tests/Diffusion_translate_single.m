@@ -4,7 +4,7 @@
 %
 function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
                                                     printflag,recordflag,rhsMaskFlag)
-
+    advectflag = 1;
     addpath('../src/');
 
     if recordflag
@@ -72,8 +72,13 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
     %Some staggered grid arrays that are necessary
     %for the advection step
-    horiz = v*ones(Nx+1,Ny);
-    vert =v*ones(Nx,Ny+1);
+    if advectflag
+        horiz = v;
+        vert = v;
+    else
+        horiz = v*ones(Nx+1,Ny);
+        vert =v*ones(Nx,Ny+1);
+    end
     
 
     
@@ -170,7 +175,12 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
         u = uold.*rhsMask;
 
         %Now we need to evaluate the advective terms
-        advec = upwind_staggered(u,horiz,vert,grid);
+        % 
+        if advectflag
+            advec = upwind_corner(u,horiz,vert,grid,dt);
+        else
+            advec = upwind_staggered(u,horiz,vert,grid);
+        end
     
         % update for v
         %
