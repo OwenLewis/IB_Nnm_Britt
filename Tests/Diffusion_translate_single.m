@@ -72,7 +72,13 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
     %Some staggered grid arrays that are necessary
     %for the advection step
-    if advectflag
+    if advectflag == 1
+        horiz = v;
+        vert = v;
+    elseif advectflag == 2
+        horiz = v;
+        vert = v;
+    elseif advectflag ==3
         horiz = v;
         vert = v;
     else
@@ -176,7 +182,7 @@ function [usolutions,timeseries] = Diffusion_translate_single(Ny,v,D,Tmax,dt,...
 
         %Now we need to evaluate the advective terms
         % 
-        if advectflag
+        if advectflag == 1
             advec = upwind_corner(u,horiz,vert,grid,dt);
         else
             advec = upwind_staggered(u,horiz,vert,grid);
