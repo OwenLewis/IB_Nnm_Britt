@@ -1,4 +1,4 @@
-Pe = 1.2e3;
+Pe = 1.2e0;
 Refine = [1,2,4,8];
 
 %some path management. 
@@ -33,7 +33,7 @@ for i = 1:length(Refine)
     [u,t] = Diffusion_translate_single(N,v,D,Tmax,dt,0,0,0);
 
 
-    filename = sprintf("diff_translate_N%i_Pe%0.1e.mat",N,Pe)
+    filename = sprintf("diff_corner_N%i_Pe%0.1e.mat",N,Pe)
     save(filename,'u','t')
 end
 
