@@ -1,30 +1,37 @@
-function divflux=upwind_corner(c,U,V,grid)
+function udotgradc=upwind_corner(c,U,V,grid,dt)
 if size(c) ~= [grid.Nx grid.Ny]
     error('Conc. being advected does not match grid size')
 end
 
-if size(U) ~= [grid.Nx+1 grid.Ny]
-    error('Horizontal vel. does not match grid size')
+cpad = zeros(grid.Nx+2,grid.Ny+2);
+
+cpad(2:end-1,2:end-1) = c;
+
+cpad(1,2:end-1) = c(end,:);
+cpad(end,2:end-1) = c(1,:);
+cpad(2:end-1,1) = c(:,end);
+cpad(2:end-1,end) = c(:,1);
+cpad(1,1) = c(end,end);
+cpad(end,1) = c(1,end);
+cpad(1,end) = c(end,1);
+cpad(end,end) = c(1,1);
+
+
+if max(U(:)) > 0
+    DX = (cpad(2:end-1,:) - cpad(1:end-2,:))/grid.dx;
+else
+    DX = (cpad(3:end,:) - cpad(2:end-1,:))/grid.dx;
 end
 
-if size(V) ~= [grid.Nx grid.Ny+1]
-    error('Vertical vel. does not match grid size')
+if max(V(:)) > 0
+    DY = (cpad(:,2:end-1) - cpad(:,1:end-2))/grid.dy;
+    DD = (DX(:,2:end-1) - DX(:,1:end-2))./grid.dy;
+else
+    DY = (cpad(:,3:end) - cpad(:,2:end-1))/grid.dy;
+    DD = (DX(:,3:end) - DX(:,2:end-1))./grid.dy;
 end
 
-xpad = zeros(grid.Nx+2,grid.Ny);
-ypad = zeros(grid.Nx,grid.Ny+2);
-
-xpad(1,:) = c(end,:);
-xpad(2:end-1,:) = c;
-xpad(end,:) = c(1,:);
-ypad(:,1) = c(:,end);
-ypad(:,2:end-1) = c;
-ypad(:,end) = c(:,1);
 
 
-horizflux = (xpad(1:end-1,:).*U).*(U > 0) + (xpad(2:end,:).*U).*(U < 0);
-
-vertflux = (ypad(:,1:end-1).*V).*(V > 0) + (ypad(:,2:end).*V).*(V < 0);
-
-divflux = diff(horizflux,1,1)./grid.dx  + diff(vertflux,1,2)./grid.dy;
+udotgradc = U*DX(:,2:end-1) + V*DY(2:end-1,:) - dt*U*V*DD;
 end
