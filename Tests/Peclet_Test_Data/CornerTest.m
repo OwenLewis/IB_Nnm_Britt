@@ -1,5 +1,5 @@
 addpath('../../src/')
-Nx = 1028;
+Nx = 512;
 Ny = Nx;
 
 L = 3;
@@ -34,10 +34,14 @@ u_0 = (-3*R.^2 + 2*R.^3 + 1).*(X.^2 + Y.^2 < 1);
 uwork = u_0;
 surf(X,Y,u_0); shading flat
 
-foo = upwind_corner(uwork,v,0,grid,dt);
+D1 = centered_diff_fourth(grid.Nx,grid.dx);
 
-bar = v*(6*X.*(R-1)).*(X.^2 + Y.^2 < 1);
+foo = v*D1*uwork;
 
+% foo = upwind_corner(uwork,v,0,grid,dt);
+
+% bar = v*(6*X.*(R-1)).*(X.^2 + Y.^2 < 1);
+% 
 % figure(1)
 % surf(X,Y,foo); shading flat
 % title('Computed')
@@ -51,9 +55,14 @@ bar = v*(6*X.*(R-1)).*(X.^2 + Y.^2 < 1);
 % title('Error')
 % max(discerr(:))
 
+udotgradc=@(c)(v*D1*c + v*c*D1');
+
 for t = dt:dt:Tmax
-    foo = upwind_corner(uwork,v,v,grid,dt);
-    uwork =uwork - dt*foo;
+    k1 = -udotgradc(uwork          );
+    k2 = -udotgradc(uwork+0.5*dt*k1);
+    k3 = -udotgradc(uwork+0.5*dt*k2);
+    k4 = -udotgradc(uwork+    dt*k3); 
+    uwork =uwork + dt*(k1+2*k2+2*k3+k4)/6;
     % surf(X,Y,uwork); shading flat
     % pause(0.0001)
 end
